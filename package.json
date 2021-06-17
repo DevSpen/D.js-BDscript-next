@@ -1,0 +1,17 @@
+{
+  "name": "new-package",
+  "version": "1.0.0",
+  "types": "./src/index.d.ts",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "node src/tests/test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "github:discordjs/discord.js",
+    "typescript": "^4.3.3"
+  },
+  "devDependencies": {},
+  "description": ""
+}
