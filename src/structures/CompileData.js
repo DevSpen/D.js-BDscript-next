@@ -1,3 +1,4 @@
+const ms = require("ms-utility")
 module.exports = class CompileData {
     constructor() {
         /**
@@ -93,6 +94,9 @@ module.exports = class CompileData {
         if (this.mainFunction.isProperty) {
             return this.total
         } else {
+            if (this.inside === undefined) {
+                return this.total
+            }
             let image = `${this.mainFunction.key}[${this.inside}]`
             for (const overload of this.overloads) {
                 image = image.replace(overload.id, overload.image)
@@ -104,7 +108,7 @@ module.exports = class CompileData {
     sendError(channel, ...data) {
         if (!channel) return undefined
 
-        const created = data.length === 1 ? data : `:x: Invalid ${data[0]} \`${data[1]}\` in \`${this.image}\`!`
+        const created = data.length === 1 ? data[0] : `:x: Invalid ${data[0]} \`${data[1]}\` in \`${this.image}\`!`
 
         try {
             channel.send(created).catch(() => null)
@@ -118,7 +122,10 @@ module.exports = class CompileData {
      * @type {string}
      */
     get total() {
-        if (this.mainFunction.brackets) {
+        if (!this.mainFunction.isProperty) {
+            if (!this.inside) {
+                return this.mainFunction.key
+            }
             return `${this.mainFunction.key}[${this.inside}]`
         }
         return `${this.mainFunction.key}`
@@ -159,10 +166,9 @@ module.exports = class CompileData {
      * @returns {Promise<string|undefined>}
      */
     async resolveAll(data) {
-        if (this.isProperty) return undefined
         const array = await this.resolveArray(data)
         if (!array) return undefined
-        else array.join(";")
+        return array.join(";")
     }
 
     /**
@@ -184,7 +190,7 @@ module.exports = class CompileData {
 
     /**
      * 
-     * @param {Object} data 
+     * @param {import("../util/Constants").ExecutionData} data 
      * @returns {Promise<string[]|undefined>}
      */
     async resolveArray(data) {
@@ -204,7 +210,82 @@ module.exports = class CompileData {
                 arr.push(field)
             }
         }
-        return arr
+
+        const resolved = []
+
+        for (let i = 0;i < this.mainFunction.params.length;i++) {
+            const param = this.mainFunction.params[i]
+            let response = arr[i]
+
+            if (param.required && !response) {
+                return this.sendError(data.mainChannel, `:x: Missing arguments in \`${this.image}\`!`)
+            }
+
+            if (!param.required && !response && param.default) {
+                response = typeof param.default === "function" ? param.default(data.message) ?? "" : param.default
+            }
+
+            if (!param.rest) {
+                const arg = await this._getArg(response, param, data, resolved)
+                if (arg === undefined) return undefined
+                else resolved.push(arg)
+            } else {
+                for (const res of arr.slice(i)) {
+                    const arg = await this._getArg(res, param, data, resolved)
+                    if (arg === undefined) return undefined
+                    else resolved.push(arg)
+                }
+            }
+        }
+
+        return resolved
+    }
+
+    /**
+     * @param {Object} target
+     * @param {import("../util/Constants").ExecutionData} source  
+     * @returns {import("../util/Constants").ExecutionData}
+     */
+    _clone(target, source) {
+        for (const [
+            key, val
+        ] of Object.entries(source)) {
+            if (target[key] === undefined) target[key] = val
+        }
+        return target
+    }
+
+    /**
+     * @private
+     * @param {string} current 
+     * @param {any[]} resolved
+     * @param {import("../util/Constants").Param} param 
+     * @param {import("../util/Constants").ExecutionData} data 
+     * @returns {Promise<any|undefined>}
+     */
+    async _getArg(current, param, data, resolved) {
+        const reject = () => {
+            this.sendError(data.mainChannel, `:x: Argument \`${current}\` is not valid for type **${param.resolveType[0] + param.resolveType.slice(1).toLowerCase()}** in \`${this.image}\``)
+            return undefined
+        }
+
+        let response = current; 
+
+        //const reference = param.source !== undefined ? resolved[param.source] : data
+
+        if (param.resolveType === "NUMBER") {
+            const n = Number(current)
+            if (isNaN(n)) return reject()
+            response = n 
+        } else if (param.resolveType === "TIME") {
+            response = ms.parseString(response)
+            if (response === undefined) return reject()
+        } else if (param.resolveType === "CHANNEL") {
+            response = data.client.channels.cache.get(response)
+            if (!response) return reject()
+        }
+
+        return response
     }
 
     /**

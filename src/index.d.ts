@@ -5,7 +5,18 @@ declare type Types = "NUMBER" | "ANY" | "BOOLEAN" | "NONE" | "STRING"
 
 declare type CommandTypes = "basicCommand" | "readyCommand"
 
-declare type BDscriptErrors = "INVALID_COMMAND_TYPE" | "INVALID_EVENT_TYPE" | "EVENT_ALREADY_REGISTERED"
+declare type ResolveTypes = "MEMBER" |
+    "TIME" |
+    "GUILD" | 
+    "USER" | 
+    "REACTION" | 
+    "MESSAGE" | 
+    "CHANNEL" |
+    "NUMBER" | 
+    "STRING"
+
+declare type BDscriptErrors = "INVALID_COMMAND_TYPE" | "INVALID_EVENT_TYPE" | "EVENT_ALREADY_REGISTERED" |
+    "SYNTAX_ERROR"
 
 declare type EventTypes = "onReady" | "onMessage"
 

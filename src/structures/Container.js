@@ -16,6 +16,12 @@ module.exports = class Container {
      */
     _patch(data) {
         /**
+         *  
+         * @type {number} 
+         */
+        this.startedTimestamp = Date.now()
+    
+        /**
          * @type {string}
          */
         this.content = data.compiled.code 
@@ -54,11 +60,12 @@ module.exports = class Container {
     /**
      * @param {?string} content
      * @returns {Promise<?Message>}
+     * @param {Webhook|TextChannel|DMChannel|CommandInteraction|Message|User} channel  
      */
-    async execute(content) {
+    async execute(content, channel) {
         if (!this.referenceChannel) return undefined
 
-        const m = await this.referenceChannel[this.sendOption]?.({
+        const m = await (channel ?? this.referenceChannel)[this.sendOption]?.({
             content,
             embeds: this.embeds,
             components: this.components

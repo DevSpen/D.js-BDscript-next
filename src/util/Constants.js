@@ -49,6 +49,17 @@ exports.AvailableEventTypes = createEnum([
 module.exports.Functions = {
     $sum: {
         key: "$sum",
+        description: "sum multiple numbers.",
+        params: [
+            {
+                name: "numbers",
+                description: "numbers to sum, separated by `;`.",
+                type: "NUMBER",
+                required: true,
+                rest: true, 
+                resolveType: "NUMBER"
+            }
+        ],
         isProperty: false,
         returns: "NUMBER",
         brackets: {
@@ -59,17 +70,73 @@ module.exports.Functions = {
     $dateStamp: {
         key: "$dateStamp",
         isProperty: true,
+        description: "returns date since 1970 in ms.",
         returns: "NUMBER"
     },
     $sendMessage: {
         key: "$sendMessage",
         isProperty: false,
         returns: "NONE",
+        description: "sends a message to given channel.",
+        params: [
+            {
+                name: "channelID",
+                type: "STRING",
+                description: "the channel to send this message to",
+                required: true,
+                resolveType: "CHANNEL"
+            }, 
+            {
+                name: "message",
+                description: "the message to send to this channel.",
+                type: "STRING",
+                required: true
+            }
+        ]
+    },
+    $executionTime: {
+        isProperty: true,
+        key: "$executionTime",
+        description: "returns command execution time",
+        returns: "NUMBER"
     },
     $channelID: {
         isProperty: true,
         key: "$channelID",
-        returns: "STRING"
+        returns: "STRING",
+        description: "returns the current channel's ID"
+    },
+    $message: {
+        key: "$message",
+        isProperty: false,
+        optional: true,
+        params: [
+            {
+                name: "arg number",
+                description: "the user argument to return.",
+                required: true,
+                type: "NUMBER",
+                resolveType: "NUMBER"
+            }
+        ],
+        returns: "STRING",
+        description: "gets user arguments from this command"
+    },
+    $eval: {
+        key: "$eval",
+        description: "evals a code.",
+        isProperty: false,
+        optional: true,
+        returns: "NONE",
+        params: [
+            {
+                name: "code",
+                description: "the code to eval",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            }
+        ]
     }
 }
 
@@ -88,10 +155,32 @@ module.exports.Functions = {
  * @property {string} key 
  * @property {?Types} returns
  * @property {boolean} isProperty
+ * @property {string[]} examples 
  * @property {string} separator 
  * @property {Object<string, Brackets>} brackets
  * @property {boolean} disabled
  * @property {?Types} accepts 
+ * @property {boolean} optional
+ * @property {Param[]} params 
+ * @property {string} description
+ */
+
+/**
+ * 
+ * @typedef {import("..").ResolveTypes} ResolveTypes
+ */
+
+/**
+ * 
+ * @typedef {Object} Param  
+ * @property {Types} type 
+ * @property {string} description
+ * @property {string} name
+ * @property {any} default 
+ * @property {boolean} rest 
+ * @property {ResolveTypes} resolveType
+ * @property {number} source 
+ * @property {boolean} required
  */
 
 /**

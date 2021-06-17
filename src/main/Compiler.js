@@ -1,6 +1,7 @@
 const { makeID, findFunctions } = require("../Structures/CompileData")
 const CompileData = require("../Structures/CompileData")
 const Definitions = require("../Util/Constants").Functions
+const DjsBDscriptError = require("../structures/DjsBDscriptError")
 const keys = Object.keys(Definitions).sort((x, y) => y.length - x.length)
 /**
  * 
@@ -15,34 +16,43 @@ module.exports = (code) => {
         code: code 
     }
 
-    while(true) {
-        const after = compiling.code.split("$").slice(1).reverse()[0]
-
-        const fnRaw = `$${after}`
-        
-        const key = keys.find(key => fnRaw.includes(key))
+    for (const after of compiling.code.split("$").slice(1).reverse()) {
+        const key = `$${after}`.match(new RegExp(`(${keys.map(e => "\\" + e).join("|")})`, "g"))?.[0]
 
         if (!key) {
-            break
-        }
+            continue
+        } 
 
         const fn = Definitions[key]
 
         if (!fn.isProperty) {
+            const r = code.split(fn.key).length - 1 
+            const after = code.split(fn.key)[r]
+            if (!fn.optional && (!after.includes("[") || !after.includes("]"))) {
+                throw new DjsBDscriptError("SYNTAX_ERROR", `${fn.key} has no brackets.`)
+            }
             const id = makeID()
-            const inside = after.split("[")[1].split("]")[0]
-            compiling.code = compiling.code.replace(`${fn.key}[${inside}]`, id)
-            compiling.functions.push(
-                new CompileData()
-                .setMainFunction(fn)
-                .setInside(inside)
+            const inside = after.split("[")[r]?.split("]")?.[0] ?? undefined
+
+            const result = inside === undefined ? fn.key : `${fn.key}[${inside}]`
+            compiling.code = compiling.code.replaceLast(result, id)
+            code = code.replaceLast(result, id)
+
+            const comp = new CompileData()
+            .setMainFunction(fn)
+            .setID(id)
+            if (inside) {
+                comp.setInside(inside)
                 .setFields(inside.split(";"))
-                .setID(id)
+            }
+            compiling.functions.push(
+                comp
             )
             continue
         } else {
             const id = makeID()
-            compiling.code = compiling.code.replace(fn.key, id)
+            compiling.code = compiling.code.replaceLast(fn.key, id)
+            code = code.replace(fn.key, id)
             compiling.functions.push(
                 new CompileData()
                 .setMainFunction(fn)
@@ -74,3 +84,9 @@ module.exports = (code) => {
 
     return compiling
 }
+
+String.prototype.replaceLast = function (what, replacement) {
+    let pcs = this.split(what);
+    let lastPc = pcs.pop();
+    return pcs.join(what) + replacement + lastPc;
+};

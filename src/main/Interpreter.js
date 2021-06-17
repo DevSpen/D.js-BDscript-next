@@ -16,14 +16,20 @@ module.exports = async (client, data) => {
 
     data.container = new Container(data.command)
     
+    data.startedTimestamp = Date.now()
+
     data.container.setChannel(data.channel)
 
     for (const fn of data.command.compiled.functions) {
-        const d = await fn.execute(data)
-        if (!d) return undefined
-        else {
-            if (d.with === undefined) continue
-            data.container.content = data.container.content.replace(d.id, d.with)    
+        try {
+            const d = await fn.execute(data)
+            if (!d) return undefined
+            else {
+                if (d.with === undefined) continue
+                data.container.content = data.container.content.replace(d.id, d.with)    
+            }
+        } catch (error) {
+            return data.container.execute(error.stack, data.mainChannel)
         }
     }
 

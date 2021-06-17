@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "github:discordjs/discord.js",
+    "ms-utility": "^1.2.0",
     "typescript": "^4.3.3"
   },
   "devDependencies": {},
