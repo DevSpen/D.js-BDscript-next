@@ -283,6 +283,9 @@ module.exports = class CompileData {
         } else if (param.resolveType === "CHANNEL") {
             response = data.client.channels.cache.get(response)
             if (!response) return reject()
+        } else if (param.resolveType === "USER") {
+            response = await data.client.users.fetch(response).catch(() => null)
+            if (!response) return reject()
         }
 
         return response

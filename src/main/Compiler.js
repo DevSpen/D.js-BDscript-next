@@ -70,6 +70,11 @@ module.exports = (code) => {
 
     for (const compiledFunc of compiling.functions.reverse()) {
         if (used_ids.includes(compiledFunc.id)) {
+            const fns = findFunctions(compiling.functions, compiledFunc)
+            for (const fn of fns) {
+                compiledFunc.createOverload(fn)
+                used_ids.push(fn.id)
+            }
             continue
         }
         const fns = findFunctions(compiling.functions, compiledFunc)

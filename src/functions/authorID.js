@@ -6,5 +6,5 @@ const CompileData = require("../Structures/CompileData");
  * @param {import("../util/Constants").ExecutionData} d 
  */
 module.exports = (fn, d) => {
-    return fn.deflate(d.message.channel.id)
+    return fn.deflate(d.message?.author?.id ?? "")
 }

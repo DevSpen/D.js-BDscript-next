@@ -13,6 +13,8 @@
     "ms-utility": "^1.2.0",
     "typescript": "^4.3.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "cloc": "^2.8.0"
+  },
   "description": ""
 }

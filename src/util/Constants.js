@@ -31,6 +31,55 @@ exports.AvailableEventTypes = createEnum([
 ])
 
 /**
+ * 
+ * @param {User} user 
+ * @returns {string}
+ */
+function userFunc (user) {}
+
+/**
+ * @typedef {Object} UserPropertyData 
+ * @property {string} description
+ * @property {userFunc} code 
+ */
+
+/**
+ * @type {Object<string, UserPropertyData>}
+ */
+exports.UserProperties = {
+    id: {
+        code: (u) => u.id, 
+        description: "the ID of this user.",
+    },
+    username: {
+        code: (u) => u.username,
+        description: "the user's username."
+    },
+    tag: {
+        code: (u) => u.tag,
+        description: "the user's username and discriminator altoghether."
+    },
+    discriminator: {
+        code: (u) => u.discriminator,
+        description: "the user's discriminator."
+    },
+    avatar: {
+        code: (u) => u.displayAvatarURL({
+            size: 2048
+        }),
+        description: "the user's avatar url."
+    },
+    bot: {
+        code: (u) => u.bot,
+        description: "whether this user is a bot account."
+    },
+    badges: {
+        code: (u) => u.flags?.toArray().join(", "),
+        description: "the badges this user has."
+    }
+}
+
+/**
  * @typedef {Object} BotOptions
  * @property {ClientOptions} client 
  * @property {string[]|string} prefix
@@ -47,6 +96,34 @@ exports.AvailableEventTypes = createEnum([
  * @type {Object<string, Prototype>}
  */
 module.exports.Functions = {
+    $user: {
+        key: "$user",
+        isProperty: false,
+        description: "retrieve info from given user ID.",
+        params: [
+            {
+                name: "user ID",
+                description: "the user to get info of",
+                type: "STRING",
+                resolveType: "USER",
+                required: true
+            },
+            {
+                name: "property",
+                type: "STRING",
+                resolveType: "STRING",
+                description: "the property or data to get from this user.",
+                required: true, 
+            }
+        ],
+        emptyReturn: true
+    },
+    $authorID: {
+        key: "$authorID",
+        description: "returns the author ID",
+        returns: "STRING",
+        isProperty: true
+    },
     $sum: {
         key: "$sum",
         description: "sum multiple numbers.",
@@ -107,6 +184,7 @@ module.exports.Functions = {
         description: "returns the current channel's ID"
     },
     $message: {
+        emptyReturn: true, 
         key: "$message",
         isProperty: false,
         optional: true,
@@ -159,6 +237,7 @@ module.exports.Functions = {
  * @property {string} separator 
  * @property {Object<string, Brackets>} brackets
  * @property {boolean} disabled
+ * @property {boolean} emptyReturn 
  * @property {?Types} accepts 
  * @property {boolean} optional
  * @property {Param[]} params 
