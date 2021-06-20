@@ -1,1 +1,1 @@
-module.exports = require("./structures/Bot") 
+module.exports = require("./structures/Bot")

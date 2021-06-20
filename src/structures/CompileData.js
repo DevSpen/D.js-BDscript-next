@@ -1,4 +1,6 @@
 const ms = require("ms-utility")
+const Constants = require("../util/Constants")
+
 module.exports = class CompileData {
     constructor() {
         /**
@@ -174,6 +176,16 @@ module.exports = class CompileData {
     /**
      * 
      * @param {Object} data 
+     * @param {number[]|string[]} indexes 
+     * @returns {Promise<string[]>}
+     */
+    async resolveAndExcludeArray(data, indexes) {
+        return await this.resolveArray(data, indexes)
+    }
+
+    /**
+     * 
+     * @param {Object} data 
      * @returns {Promise<Object|undefined>}
      */
     async execute(data) {
@@ -184,19 +196,26 @@ module.exports = class CompileData {
         return {
             id: this.id,
             replace: this.total,
-            with: replacer
+            with: replacer ?? ""
         }
     }
 
     /**
      * 
+     * @param {string[]|number[]} indexes
      * @param {import("../util/Constants").ExecutionData} data 
      * @returns {Promise<string[]|undefined>}
      */
-    async resolveArray(data) {
+    async resolveArray(data, indexes = []) {
         if (this.isProperty) return undefined
         const arr = []
+        let y = 0
         for (const field of this.fields) {
+            if (indexes.includes(y)) {
+                arr.push(field)
+                y++ 
+                continue
+            } else y++
             const fns = this.overloadsFor(field)
             if (fns.length) {
                 let text = field
@@ -223,6 +242,11 @@ module.exports = class CompileData {
 
             if (!param.required && !response && param.default) {
                 response = typeof param.default === "function" ? param.default(data.message) ?? "" : param.default
+            }
+
+            if (indexes.includes(i)) {
+                resolved.push(response)
+                continue
             }
 
             if (!param.rest) {
@@ -284,7 +308,16 @@ module.exports = class CompileData {
             response = data.client.channels.cache.get(response)
             if (!response) return reject()
         } else if (param.resolveType === "USER") {
+            if (!Constants.REGEXES.ID.test(response)) return reject()
             response = await data.client.users.fetch(response).catch(() => null)
+            if (!response) return reject()
+        } else if (param.resolveType === "GUILD") {
+            response = data.client.guilds.cache.get(response)
+            if (!response) return reject()
+        } else if (param.resolveType === "ROLE") {
+            const reference = param.source !== undefined ? resolved[param.source] : data.client.guilds.cache.get(response)
+            if (!reference) return reject()
+            response = reference.roles.cache.get(response)
             if (!response) return reject()
         }
 
@@ -299,6 +332,12 @@ module.exports = class CompileData {
      */
     async resolveCode(data, code) {
         if (this.isProperty) return undefined
-        
+        const loads = this.overloadsFor(code)
+        for (const load of loads) {
+            const res = await load.execute(data)
+            if (!res) return undefined
+            else code = code.replace(res.id, res.with)
+        }
+        return code
     }
 }

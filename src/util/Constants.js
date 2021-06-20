@@ -1,4 +1,4 @@
-const { Client, ClientOptions, DMChannel, TextChannel, Webhook, Message, User, Intents, Collection } = require("discord.js")
+const { Client, ClientOptions, DMChannel, TextChannel, Webhook, Message, User, Intents, Collection, Guild, Role } = require("discord.js")
 const Interpreter = require("../main/Interpreter")
 const CommandAdapter = require("../structures/CommandAdapter")
 const CompileData = require("../structures/CompileData")
@@ -29,6 +29,92 @@ exports.AvailableEventTypes = createEnum([
     "onMessage",
     "onReady"
 ])
+
+/**
+ * 
+ * @param {Role} role 
+ * @returns {string}
+ */
+ function roleFunc (role) {}
+
+/**
+ * @typedef {Object} RolePropertyData 
+ * @property {string} description
+ * @property {roleFunc} code 
+ */
+  
+/**
+ * @type {Object<string, RolePropertyData>}
+ */
+exports.RoleProperties = {
+    name: {
+        code: (r) => r.name,
+        description: "the name of this role."
+    },
+    id: {
+        code: (r) => r.id,
+        description: "the id of this role."
+    },
+    position: {
+        code: r => r.position,
+        description: "the position of this role."
+    },
+    isEveryoneRole: {
+        code: (r) => r.id === r.guild.id,
+        description: "whether this role is the @everyone role for this guild."
+    },
+    isMentionable: {
+        code: r => r.mentionable,
+        description: "whether the role is mentionable."
+    },
+    mention: {
+        code: r => r.toString(),
+        description: "returns this role as mention format."
+    }
+}
+
+/**
+ * 
+ * @param {Guild} guild  
+ * @returns {string}
+ */
+function serverFunc (guild) {}
+
+/**
+ * @typedef {Object} ServerPropertyData 
+ * @property {string} description
+ * @property {serverFunc} code 
+ */
+ 
+/**
+ * @type {Object<string, ServerPropertyData>}
+ */
+exports.ServerProperties = {
+    id: {
+        description: "the id for this guild.",
+        code: (s) => s.id
+    },
+    emojis: {
+        description: "returns all the emote IDs for this guild.",
+        code: (s) => s.emojis.cache.map(e => e.id).join(", ")
+    },
+    roles: {
+        description: "returns all the role IDs for this guild.",
+        code: (s) => s.roles.cache.map(r => r.id).join(", ")
+    },
+    members: {
+        description: "returns all cached member IDs for this guild.",
+        code: (s) => s.members.cache.map(e => e.id).join(", ")
+    },
+    memberCount: {
+        description: "approximated member count for this guild",
+        code: (s) => s.memberCount ?? 0 
+    },
+    channels: {
+        description: "returns all the channel IDs for this guild.",
+        code: (s) => s.channels.cache.map(e => e.id).join(", ")
+    }
+}
 
 /**
  * 
@@ -99,10 +185,11 @@ module.exports.Functions = {
     $user: {
         key: "$user",
         isProperty: false,
+        returns: "ANY",
         description: "retrieve info from given user ID.",
         params: [
             {
-                name: "user ID",
+                name: "userID",
                 description: "the user to get info of",
                 type: "STRING",
                 resolveType: "USER",
@@ -118,9 +205,123 @@ module.exports.Functions = {
         ],
         emptyReturn: true
     },
+    $role: {
+        key: "$role",
+        isProperty: false,
+        returns: "ANY",
+        description: "retrieve info from given role ID.",
+        params: [
+            {
+                name: "guildID",
+                description: "the guild where this role is in",
+                type: "STRING",
+                resolveType: "GUILD",
+                required: true
+            },
+            {
+                name: "roleID",
+                type: "STRING",
+                resolveType: "ROLE",
+                description: "the role to retrieve info of.",
+                required: true,
+                source: 0 
+            },
+            {
+                name: "property",
+                type: "STRING",
+                resolveType: "STRING",
+                description: "the property or data to get from this role.",
+                required: true, 
+            }
+        ],
+        emptyReturn: true
+    },
+    $server: {
+        key: "$server",
+        returns: "ANY", 
+        isProperty: false,
+        description: "retrieve info from given guild ID.",
+        params: [
+            {
+                name: "guildID",
+                description: "the guild to get info of",
+                type: "STRING",
+                resolveType: "GUILD",
+                required: true
+            },
+            {
+                name: "property",
+                type: "STRING",
+                resolveType: "STRING",
+                description: "the property or data to get from this guild.",
+                required: true, 
+            }
+        ],
+        emptyReturn: true
+    },
     $authorID: {
         key: "$authorID",
         description: "returns the author ID",
+        returns: "STRING",
+        isProperty: true
+    },
+    $data: {
+        key: "$data",
+        description: "return assigned data from a function or callback.",
+        returns: "ANY",
+        emptyReturn: true,
+        isProperty: false,
+        params: [
+            {
+                name: "property",
+                description: "property to get data from",
+                required: true,
+                resolveType: "STRING",
+                type: "STRING"
+            }
+        ]
+    },
+    $forEach: {
+        key: "$forEach",
+        description: "loops over given elements with a separator.",
+        isProperty: false,
+        params: [
+            {
+                name: "elements",
+                description: "element or elements to loop through.",
+                type: "STRING",
+                required: true,
+                resolveType: "STRING"
+            },
+            {
+                name: "separator",
+                type: "ANY",
+                resolveType: "STRING",
+                description: "the separator to split the elements by",
+                required: true
+            },
+            {
+                name: "code",
+                type: "STRING",
+                resolveType: "STRING",
+                description: "the code used to execute for each element, $data[value] will contain the element for each loop lap.",
+                required: true
+            },
+            {
+                name: "separator",
+                resolveType: "STRING",
+                description: "the separator that will be used to separate each lap output.",
+                required: false,
+                default: ", ",
+                type: "ANY"
+            }
+        ],
+        emptyReturn: true, 
+        returns: "ANY"
+    },
+    $guildID: {
+        key: "$guildID",
+        description: "returns the guild ID",
         returns: "STRING",
         isProperty: true
     },
@@ -269,6 +470,10 @@ module.exports.Functions = {
  */
 
 /**
+ * @typedef {import("..").CommandTypes} CommandTypes
+ */
+
+/**
  * @typedef {Object} CommandData 
  * @property {?string} name
  * @property {?string[]} aliases
@@ -308,4 +513,14 @@ function createEnum(arr) {
         obj[i] = v 
     }
     return obj
+}
+
+/**
+ * Available regexes.
+ */
+module.exports.REGEXES = {
+    /**
+     * @type {RegExp}
+     */
+    ID: /^(\d{17,19})$/
 }

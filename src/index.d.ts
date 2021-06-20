@@ -1,5 +1,5 @@
 import { Client, ClientOptions } from "discord.js"
-import { CommandData, Commands } from "./util/Constants"
+import { Commands } from "./util/Constants"
 
 declare type Types = "NUMBER" | "ANY" | "BOOLEAN" | "NONE" | "STRING"
 
@@ -13,7 +13,8 @@ declare type ResolveTypes = "MEMBER" |
     "MESSAGE" | 
     "CHANNEL" |
     "NUMBER" | 
-    "STRING"
+    "STRING" | 
+    "ROLE"
 
 declare type BDscriptErrors = "INVALID_COMMAND_TYPE" | "INVALID_EVENT_TYPE" | "EVENT_ALREADY_REGISTERED" |
     "SYNTAX_ERROR"
@@ -26,6 +27,12 @@ interface BotOptions {
     client?: ClientOptions
 }
 
+interface CommandData {
+    name?: string
+    type: CommandTypes
+    code: string 
+    aliases?: Array<string>
+}
 export class Bot {
     events: EventTypes[];
     client: Client

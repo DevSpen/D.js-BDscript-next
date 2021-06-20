@@ -4,17 +4,17 @@
   "types": "./src/index.d.ts",
   "main": "./src/index.js",
   "scripts": {
-    "test": "node src/tests/test"
+    "test": "tsc src/tests/test.ts && node src/tests/test.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/voice": "^0.5.0",
     "discord.js": "github:discordjs/discord.js",
-    "ms-utility": "^1.2.0",
-    "typescript": "^4.3.3"
+    "ms-utility": "^1.2.0"
   },
   "devDependencies": {
     "cloc": "^2.8.0"
   },
-  "description": ""
+  "description": "a nice package"
 }

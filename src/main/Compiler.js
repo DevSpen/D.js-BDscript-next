@@ -32,7 +32,7 @@ module.exports = (code) => {
                 throw new DjsBDscriptError("SYNTAX_ERROR", `${fn.key} has no brackets.`)
             }
             const id = makeID()
-            const inside = after.split("[")[r]?.split("]")?.[0] ?? undefined
+            const inside = after.split("[")[1]?.split("]")?.[0] ?? undefined
 
             const result = inside === undefined ? fn.key : `${fn.key}[${inside}]`
             compiling.code = compiling.code.replaceLast(result, id)
@@ -52,7 +52,7 @@ module.exports = (code) => {
         } else {
             const id = makeID()
             compiling.code = compiling.code.replaceLast(fn.key, id)
-            code = code.replace(fn.key, id)
+            code = code.replaceLast(fn.key, id)
             compiling.functions.push(
                 new CompileData()
                 .setMainFunction(fn)
@@ -70,11 +70,14 @@ module.exports = (code) => {
 
     for (const compiledFunc of compiling.functions.reverse()) {
         if (used_ids.includes(compiledFunc.id)) {
-            const fns = findFunctions(compiling.functions, compiledFunc)
-            for (const fn of fns) {
-                compiledFunc.createOverload(fn)
-                used_ids.push(fn.id)
+            function merge(compiledFunc, compiling) {
+                const fns = findFunctions(compiling.functions, compiledFunc)
+                for (const fn of fns) {
+                    compiledFunc.createOverload(fn)
+                    used_ids.push(fn.id)
+                }
             }
+            merge(compiledFunc, compiling)
             continue
         }
         const fns = findFunctions(compiling.functions, compiledFunc)

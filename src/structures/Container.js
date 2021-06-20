@@ -1,4 +1,5 @@
 const { MessageEmbed, Webhook, TextChannel, DMChannel, CommandInteraction, Message, MessageActionRow, User } = require("discord.js")
+const { day } = require("ms-utility/src/util/Container")
 const CommandAdapter = require("./CommandAdapter")
 
 module.exports = class Container {
@@ -27,6 +28,11 @@ module.exports = class Container {
         this.content = data.compiled.code 
         
         /**
+         * @type {Object<string, any>}
+         */
+        this.data = {}
+
+        /**
          * @type {MessageActionRow[]}
          */
         this.components = []
@@ -47,6 +53,15 @@ module.exports = class Container {
             isReplyEphemeral: false,
             replyType: null
         }
+    }
+
+    addData(data, name) {
+        if (name) {
+            this.data[name] = data
+            return this.data
+        }
+        this.data = Object.assign(this.data, data)
+        return this.data
     }
 
     /**
