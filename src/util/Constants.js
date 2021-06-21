@@ -202,7 +202,79 @@ exports.ChannelProperties = {
     name: {
         code: c => c.name,
         description: "the name of this channel."
-    }
+    },
+       createdTimestamp: {
+        code: c => c.createdTimestamp,
+        description: "The timestamp when this channel was created, in milliseconds."
+    },
+    type: {
+        code: c => c.type,
+        description: "The channel type."
+    },
+    deleteable: {
+        code: c => c.deletable,
+        description: "Returns whether the bot can delete this channel or not."
+    },
+    manageable: {
+        code: c => c.manageable,
+        description: "Returns whether the bot can edit this channel or not."
+    },
+     parentID: {
+        code: c => c.parentID,
+        description: "Returns the ID of the category that this channel belongs to."
+    },
+    position: {
+        code: c => c.position,
+        description: "The position of this channel."
+    },
+     viewable: {
+        code: c => c.viewable,
+        description: "Whether or not this channel is viewable by the bot."  
+     },
+     slowmode: {
+        code: c => c.rateLimitPerUser,
+        description: "The slowmode of this channel in seconds."  
+     },
+     nsfw: {
+        code: c => c.nsfw,
+        description: "Whether this channel is NSFW or not."  
+     },
+     lastPinTimestamp: {
+        code: c => c.lastPinTimestamp,
+        description: "The timestamp when the last pinned message was pinned, in milliseconds."  
+     },
+     lastMessageID: {
+        code: c => c.lastMessageID,
+        description: "Returns the latest message ID of this channel."  
+     },
+     topic: {
+        code: c => c.topic,
+        description: "Returns this channel's topic."  
+     },
+     typing: {
+        code: c => c.typing,
+        description: "Whether or not the typing indicator is being shown in the channel."  
+     },
+     bitrate: {
+        code: c => c.bitrate,
+        description: "The bitrate of this channel."  
+     },
+     full: {
+        code: c => c.full,
+        description: "Whether or not this channel is full."  
+     },
+     joinable: {
+        code: c => c.joinable,
+        description: "Whether or not this channel is joinable by the bot."  
+     },
+     speakable: {
+        code: c => c.speakable,
+        description: "Whether or not the bot can speak in this channel."  
+     },
+     userLimit: {
+        code: c => c.userLimit,
+        description: "The maximum amount of users allowed in this channel. 0 means unlimited."  
+   }
 }
 
 /**
