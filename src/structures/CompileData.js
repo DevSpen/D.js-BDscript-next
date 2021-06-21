@@ -319,6 +319,11 @@ module.exports = class CompileData {
             if (!reference) return reject()
             response = reference.roles.cache.get(response)
             if (!response) return reject()
+        } else if (param.resolveType === "MEMBER") {
+            const reference = param.source !== undefined ? resolved[param.source] : data.client.guilds.cache.get(response)
+            if (!reference) return reject()
+            response = await reference.members.fetch(response).catch(() => null)
+            if (!response) return reject()
         }
 
         return response

@@ -1,4 +1,4 @@
-const { Client, ClientOptions, DMChannel, TextChannel, Webhook, Message, User, Intents, Collection, Guild, Role } = require("discord.js")
+const { Client, ClientOptions, DMChannel, TextChannel, Webhook, Message, User, Intents, Collection, Guild, Role, GuildMember } = require("discord.js")
 const Interpreter = require("../main/Interpreter")
 const CommandAdapter = require("../structures/CommandAdapter")
 const CompileData = require("../structures/CompileData")
@@ -29,6 +29,61 @@ exports.AvailableEventTypes = createEnum([
     "onMessage",
     "onReady"
 ])
+
+/**
+ * 
+ * @param {GuildMember} member  
+ * @returns {string}
+ */
+ function memberFunc (member) {}
+
+/**
+ * @typedef {Object} MemberPropertyData 
+ * @property {string} description
+ * @property {memberFunc} code 
+ */
+  
+/**
+ * @type {Object<string, MemberPropertyData>}
+ */
+exports.MemberProperties = {
+    guildID: {
+        description: "the guild this member is in",
+        code: m => m.guild.id
+    },
+    nickname: {
+        description: "the nickname of this user, if any.",
+        code: m => m.nickname
+    },
+    displayName: {
+        description: "the nick of name of this user.",
+        code: m => m.displayName
+    },
+    joinedTimestamp: {
+        description: "the time this member joined this server in ms.",
+        code: m => m.joinedTimestamp
+    },
+    id: {
+        description: "the id of this user.",
+        code: m => m.id
+    },
+    hexColor: {
+        description: "the user's highest role hex color.",
+        code: m => m.displayHexColor
+    },
+    color: {
+        description: "the user's highest role int color.", 
+        code: m => m.displayColor
+    },
+    highestRoleID: {
+        description: "the user's highest role ID.",
+        code: m => m.roles.highest.id
+    },
+    roles: {
+        description: "the role IDs of this user.",
+        code: m => m.roles.cache.map(r => r.id).join(", ")
+    }
+}
 
 /**
  * 
@@ -66,6 +121,10 @@ exports.RoleProperties = {
     isMentionable: {
         code: r => r.mentionable,
         description: "whether the role is mentionable."
+    },
+    members: {
+        code: r => r.members.map(m => m.id).join(", "),
+        description: "returns cached member IDs with this role."
     },
     mention: {
         code: r => r.toString(),
@@ -162,6 +221,10 @@ exports.UserProperties = {
     badges: {
         code: (u) => u.flags?.toArray().join(", "),
         description: "the badges this user has."
+    },
+    createdTimestamp: {
+        code: u => u.createdTimestamp,
+        description: "the time this user created this account in ms."
     }
 }
 
@@ -236,6 +299,37 @@ module.exports.Functions = {
         ],
         emptyReturn: true
     },
+    $member: {
+        key: "$member",
+        isProperty: false,
+        returns: "ANY",
+        description: "retrieve info from given member ID.",
+        params: [
+            {
+                name: "guildID",
+                description: "the guild where this member is in",
+                type: "STRING",
+                resolveType: "GUILD",
+                required: true
+            },
+            {
+                name: "userID",
+                type: "STRING",
+                resolveType: "MEMBER",
+                description: "the member to retrieve info of.",
+                required: true,
+                source: 0 
+            },
+            {
+                name: "property",
+                type: "STRING",
+                resolveType: "STRING",
+                description: "the property or data to get from this member.",
+                required: true, 
+            }
+        ],
+        emptyReturn: true
+    },
     $server: {
         key: "$server",
         returns: "ANY", 
@@ -264,6 +358,36 @@ module.exports.Functions = {
         description: "returns the author ID",
         returns: "STRING",
         isProperty: true
+    },
+    $if: {
+        key: "$if",
+        description: "makes an if statement.",
+        isProperty: false,
+        returns: "ANY",
+        emptyReturn: true,
+        params: [
+            {
+                name: "condition",
+                description: "the condition to test.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            },
+            {
+                name: "ifCode",
+                description: "code to execute if condition is true.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            },
+            {
+                name: "elseCode",
+                description: "code to execute if the condition is false.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: false
+            }
+        ]
     },
     $data: {
         key: "$data",
@@ -372,6 +496,21 @@ module.exports.Functions = {
             }
         ]
     },
+    $parseTime: {
+        key: "$parseTime", 
+        isProperty: false,
+        description: "converts ms to time string.",
+        returns: "STRING",
+        params: [
+            {
+                name: "ms",
+                description: "the ms to convert.",
+                type: "NUMBER",
+                resolveType: "NUMBER",
+                required: true
+            }
+        ]
+    },
     $executionTime: {
         isProperty: true,
         key: "$executionTime",
@@ -400,6 +539,27 @@ module.exports.Functions = {
         ],
         returns: "STRING",
         description: "gets user arguments from this command"
+    },
+    $description: {
+        key: "$description",
+        description: "set an embed description to given embed index.",
+        returns: "NONE",
+        params: [
+            {
+                name: "index",
+                resolveType: "NUMBER",
+                type: "NUMBER",
+                description: "the index of the embed to add this data to.",
+                required: true
+            },
+            {
+                name: "text",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the description to add to this embed.",
+            }
+        ]
     },
     $eval: {
         key: "$eval",
@@ -495,6 +655,7 @@ module.exports.Functions = {
  * @property {Container} container
  * @property {string[]} args 
  * @property {Message} message
+ * @property {boolean} returnContainer
  * @property {Client} client 
  * @property {TextChannel|DMChannel|User|Webhook|Message} mainChannel 
  * @property {TextChannel|DMChannel|User|Webhook|Message} channel
@@ -523,4 +684,42 @@ module.exports.REGEXES = {
      * @type {RegExp}
      */
     ID: /^(\d{17,19})$/
+}
+
+module.exports.OPERATORS = [
+    "<=", ">=", "!=", "==", ">", "<"
+]
+
+/**
+ * 
+ * @param {any} value1 
+ * @param {string} operator 
+ * @param {any} value2 
+ */
+module.exports.condition = (value1, operator, value2) => {
+    if ([
+        "<=",
+        ">=",
+        ">",
+        "<"
+    ].includes(operator)) {
+        value2 = Number(value2)
+        value1 = Number(value1)
+    }
+
+    if (operator === "!=") {
+        if (value1 === value2) return false
+    } else if (operator === "==") {
+        if (value1 !== value2) return false
+    } else if (operator === "<") {
+        if (value1 >= value2) return false
+    } else if (operator === ">") {
+        if (value1 <= value2) return false
+    } else if (operator === ">=") {
+        if (value1 < value2) return false
+    } else if (operator === "<=") {
+        if (value1 > value2) return false 
+    }
+
+    return true
 }

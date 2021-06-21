@@ -21,8 +21,8 @@ module.exports = async (fn, d) => {
         d.container.addData(value, "value")
         const txt = await fn.resolveCode(d, code)
         if (txt === undefined) return undefined
-        if (txt) {
-            content.push(txt)
+        if (txt.trim()) {
+            content.push(txt.trim())
         } 
     }
 

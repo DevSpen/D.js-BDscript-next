@@ -96,6 +96,19 @@ module.exports = class Container {
         return m
     }
 
+    /**
+     * Return an embed
+     * @param {number|string} index
+     * @returns {MessageEmbed} 
+     */
+    getEmbed(index) {
+        index = Number(index) - 1
+        if (!this.embeds[index]) {
+            this.embeds.push(new MessageEmbed())
+            return this.embeds[this.embeds.length - 1]
+        } else return this.embeds[index]
+    }
+
     get sendOption() {
         return this.replyOptions.replyType ?? "send"
     }

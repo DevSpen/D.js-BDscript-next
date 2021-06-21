@@ -1,11 +1,11 @@
-const { Client } = require("discord.js")
+const { Client, Message } = require("discord.js")
 const Container = require("../structures/Container")
 
 /**
  * 
  * @param {Client} client 
  * @param {import("../util/Constants").ExecutionData} data 
- * @returns {Promise<?Container>}
+ * @returns {Promise<?Container|Message>}
  */
 module.exports = async (client, data) => {
     data.client = client
@@ -33,5 +33,11 @@ module.exports = async (client, data) => {
         }
     }
 
-    return data.container
+    if (data.returnContainer) {
+        return data.container
+    }
+
+    const m = await data.container.execute(data.container.content, data.channel)
+
+    return m 
 }
