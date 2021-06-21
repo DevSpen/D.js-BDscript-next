@@ -207,6 +207,10 @@ exports.ChannelProperties = {
         code: c => c.createdTimestamp,
         description: "The timestamp when this channel was created, in milliseconds."
     },
+    id: {
+        code: c => c.id,
+        description: "This is useless."
+    },
     type: {
         code: c => c.type,
         description: "The channel type."
