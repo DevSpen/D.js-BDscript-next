@@ -134,6 +134,29 @@ exports.RoleProperties = {
 
 /**
  * 
+ * @param {TextChannel} channel   
+ * @returns {string}
+ */
+ function channelFunc (channel) {}
+
+/**
+ * @typedef {Object} ChannelPropertyData 
+ * @property {string} description 
+ * @property {serverFunc} code 
+ */
+  
+ /**
+ * @type {Object<string, ChannelPropertyData>}
+ */
+exports.ChannelProperties = {
+    name: {
+        code: c => c.name,
+        description: "the name of this channel."
+    }
+}
+
+/**
+ * 
  * @param {Guild} guild  
  * @returns {string}
  */
