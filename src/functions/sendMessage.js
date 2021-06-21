@@ -8,12 +8,13 @@ const CompileData = require("../Structures/CompileData");
 module.exports = async (fn, d) => {
     const [
         channel,
-        message 
+        message,
+        returnID
     ] = (await fn.resolveArray(d)) ?? []
 
     if (channel === undefined) return undefined
 
-    await d.container.execute(message, channel)
+    const m = await d.container.execute(message, channel)
 
-    return fn.deflate()
+    return fn.deflate(returnID && m ? m.id : "")
 }

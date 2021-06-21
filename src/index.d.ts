@@ -14,7 +14,8 @@ declare type ResolveTypes = "MEMBER" |
     "CHANNEL" |
     "NUMBER" | 
     "STRING" | 
-    "ROLE"
+    "ROLE" | 
+    "BOOLEAN"
 
 declare type BDscriptErrors = "INVALID_COMMAND_TYPE" | "INVALID_EVENT_TYPE" | "EVENT_ALREADY_REGISTERED" |
     "SYNTAX_ERROR"

@@ -493,6 +493,14 @@ module.exports.Functions = {
                 description: "the message to send to this channel.",
                 type: "STRING",
                 required: true
+            },
+            {
+                name: "return message ID",
+                description: "whether to return the newly sent message's ID",
+                type: "BOOLEAN",
+                resolveType: "BOOLEAN",
+                default: false,
+                required: false
             }
         ]
     },
@@ -558,6 +566,34 @@ module.exports.Functions = {
                 type: "STRING",
                 required: false,
                 description: "the description to add to this embed.",
+            }
+        ]
+    },
+    $title: {
+        key: "$title",
+        description: "set an embed title to given embed index.",
+        returns: "NONE",
+        params: [
+            {
+                name: "index",
+                resolveType: "NUMBER",
+                type: "NUMBER",
+                description: "the index of the embed to add this data to.",
+                required: true
+            },
+            {
+                name: "text",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the title to add to this embed.",
+            },
+            {
+                name: "url",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the url to add to this embed title.",
             }
         ]
     },

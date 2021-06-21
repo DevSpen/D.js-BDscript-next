@@ -240,12 +240,17 @@ module.exports = class CompileData {
                 return this.sendError(data.mainChannel, `:x: Missing arguments in \`${this.image}\`!`)
             }
 
-            if (!param.required && !response && param.default) {
+            if (!param.required && !response && param.default !== undefined) {
                 response = typeof param.default === "function" ? param.default(data.message) ?? "" : param.default
             }
 
             if (indexes.includes(i)) {
                 resolved.push(response)
+                continue
+            }
+
+            if (!response) {
+                resolved.push(response) 
                 continue
             }
 
@@ -324,6 +329,18 @@ module.exports = class CompileData {
             if (!reference) return reject()
             response = await reference.members.fetch(response).catch(() => null)
             if (!response) return reject()
+        } else if (param.resolveType === "BOOLEAN") {
+            if (typeof response !== "boolean") {
+                const falsy = ["no", "false"]
+                const truthy = ["yes", "true"]
+                const all = falsy.concat(truthy)
+                if (!all.includes(response)) return reject()
+                if (falsy.includes(response)) {
+                    response = false
+                } else if (truthy.includes(response)) {
+                    response = true
+                }
+            }
         }
 
         return response
