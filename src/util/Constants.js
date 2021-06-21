@@ -134,6 +134,56 @@ exports.RoleProperties = {
 
 /**
  * 
+ * @param {Client} client  
+ * @returns {string}
+ */
+ function clientFunc (client) {}
+
+/**
+ * @typedef {Object} ClientPropertyData 
+ * @property {string} description 
+ * @property {clientFunc} code 
+ */
+  
+ /**
+ * @type {Object<string, ClientPropertyData>}
+ */
+exports.ClientProperties = {
+    id: {
+        description: "the id of the client.",
+        code: c => c.user.id
+    },
+    users: {
+        description: "the cached user IDs.",
+        code: c => c.users.cache.map(c => c.id).join(", ")
+    },
+    guilds: {
+        description: "the guild IDs this bot is in.",
+        code: c => c.guilds.cache.map(c => c.id).join(", ")
+    },
+    channels: {
+        description: "the channel IDs of all guilds",
+        code: c => c.channels.cache.map(c => c.id).join(", ")
+    },
+    emojis: {
+        description: "the emoji IDs of all guilds.",
+        code: c => c.emojis.cache.map(e => e.id).join(", ")
+    },
+    owners: {
+        description: "the owner IDs of this application.",
+        code: async c => {
+            const app = await c.application.fetch()
+            if (app.owner instanceof User) {
+                return app.owner.id
+            } else {
+                return app.owner.members.map(m => m.id).join(", ")
+            }
+        }
+    }
+}
+
+/**
+ * 
  * @param {TextChannel} channel   
  * @returns {string}
  */
@@ -142,7 +192,7 @@ exports.RoleProperties = {
 /**
  * @typedef {Object} ChannelPropertyData 
  * @property {string} description 
- * @property {serverFunc} code 
+ * @property {channelFunc} code 
  */
   
  /**
@@ -268,6 +318,22 @@ exports.UserProperties = {
  * @type {Object<string, Prototype>}
  */
 module.exports.Functions = {
+    $client: {
+        key: "$client",
+        isProperty: false,
+        returns: "ANY",
+        description: "retrieve info from the client.",
+        params: [
+            {
+                name: "property",
+                type: "STRING",
+                resolveType: "STRING",
+                description: "the property or data to get from the client.",
+                required: true, 
+            }
+        ],
+        emptyReturn: true
+    },
     $user: {
         key: "$user",
         isProperty: false,
