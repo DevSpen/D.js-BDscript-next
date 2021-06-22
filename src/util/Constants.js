@@ -762,6 +762,23 @@ module.exports.Functions = {
             }
         ]
     },
+    $reply: {
+        key: "$reply",
+        description: "whether this message is a reply.",
+        emptyReturn: true,
+        isProperty: false,
+        optional: true,
+        params: [
+            {
+                name: "mention",
+                description: "whether to mention the user.",
+                type: "BOOLEAN",
+                resolveType: "BOOLEAN",
+                required: true,
+                default: false
+            }
+        ]
+    },
     $eval: {
         key: "$eval",
         description: "evals a code.",
@@ -846,6 +863,7 @@ module.exports.Functions = {
  * @typedef {Object} ReplyOptions 
  * @property {boolean} isReply
  * @property {boolean} isReplyEphemeral
+ * @property {boolean} replyMention 
  * @property {boolean} isReplyWaiting
  * @property {?string} replyType
  */

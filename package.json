@@ -1,6 +1,6 @@
 {
   "name": "d.js-bdscript",
-  "version": "1.0.0",
+  "version": "5.0.0-next",
   "types": "./src/index.d.ts",
   "main": "./src/index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@discordjs/voice": "^0.5.0",
-    "discord.js": "github:discordjs/discord.js",
+    "discord.js": "^13.0.0-dev.c850ae10270076c4b2e10b130dd8f88eed4ed201",
     "ms-utility": "^1.2.0"
   },
   "devDependencies": {

@@ -37,7 +37,7 @@ module.exports = async (client, data) => {
         return data.container
     }
 
-    const m = await data.container.execute(data.container.content, data.channel)
+    const m = await data.container.execute(data.container.content)
 
     return m 
 }

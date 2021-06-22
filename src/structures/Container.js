@@ -1,5 +1,4 @@
 const { MessageEmbed, Webhook, TextChannel, DMChannel, CommandInteraction, Message, MessageActionRow, User } = require("discord.js")
-const { day } = require("ms-utility/src/util/Container")
 const CommandAdapter = require("./CommandAdapter")
 
 module.exports = class Container {
@@ -51,6 +50,7 @@ module.exports = class Container {
             isReply: false,
             isReplyWaiting: false,
             isReplyEphemeral: false,
+            replyMention: false,
             replyType: null
         }
     }
@@ -80,15 +80,21 @@ module.exports = class Container {
     async execute(content, channel) {
         if (!this.referenceChannel) return undefined
 
+        const allowedMentions = {
+            repliedUser: this.replyOptions.replyMention
+        }
+
         const m = await (channel ?? this.referenceChannel)[this.sendOption]?.({
             content,
             embeds: this.embeds,
-            components: this.components
+            components: this.components,
+            allowedMentions 
         }).catch(() => null)
 
         this.components = []
         this.embeds = []
         this.replyOptions.isReply = false
+        this.replyOptions.replyMention = false
         this.replyOptions.isReplyEphemeral = false
         this.replyOptions.isReplyWaiting = false
         this.replyOptions.replyType = null
