@@ -1,1 +1,3 @@
-module.exports = require("./structures/Bot")
+import Bot from "./structures/Bot";
+
+module.exports = Bot
