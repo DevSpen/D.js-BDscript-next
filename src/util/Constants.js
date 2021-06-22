@@ -779,6 +779,23 @@ module.exports.Functions = {
             }
         ]
     },
+    $log: {
+        key: "$log",
+        description: "prints something in the console.",
+        emptyReturn: true,
+        isProperty: false,
+        returns: "NONE",
+        params: [
+            {
+                name: "message",
+                description: "the message to print.",
+                type: "ANY",
+                resolveType: "STRING",
+                required: false,
+                default: ""
+            }
+        ]
+    },
     $eval: {
         key: "$eval",
         description: "evals a code.",

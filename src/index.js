@@ -1,3 +1,1 @@
-const Bot = require("./structures/Bot");
-
-exports.Bot = Bot
+module.exports.Bot = require("./structures/Bot");

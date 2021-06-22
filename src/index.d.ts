@@ -18,7 +18,7 @@ declare type ResolveTypes = "MEMBER" |
     "BOOLEAN"
 
 declare type BDscriptErrors = "INVALID_COMMAND_TYPE" | "INVALID_EVENT_TYPE" | "EVENT_ALREADY_REGISTERED" |
-    "SYNTAX_ERROR"
+    "SYNTAX_ERROR" | "SLASH_COMMAND_ALREADY_EXISTS"
 
 declare type EventTypes = "onReady" | "onMessage"
 

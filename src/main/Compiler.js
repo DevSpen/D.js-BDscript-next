@@ -41,7 +41,7 @@ module.exports = (code) => {
             const comp = new CompileData()
             .setMainFunction(fn)
             .setID(id)
-            if (inside) {
+            if (inside !== undefined) {
                 comp.setInside(inside)
                 .setFields(inside.split(";"))
             }

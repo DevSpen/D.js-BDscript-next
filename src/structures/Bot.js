@@ -25,6 +25,11 @@ module.exports = class Bot {
         this.client.bot = this 
 
         /**
+         * @type {Collection<string, import("discord.js").ApplicationCommandData}
+         */
+        this.slash_commands = new Collection()
+
+        /**
          * @type {import("../util/Constants").Commands}
          */
         this.commands = this._dispatchCommands()
@@ -58,6 +63,19 @@ module.exports = class Bot {
         return options
     }
 
+    /**
+     * Creates data for a slash command.
+     * @param {import("discord.js").ApplicationCommandData} data 
+     * @returns {Bot}
+     */
+    createSlashCommandData(data = {}) {
+        if (this.slash_commands.has(data.name)) {
+            throw new DjsBDscriptError("SLASH_COMMAND_ALREADY_EXISTS", data.name)
+        }
+        this.slash_commands.set(data.name, data)
+        return this
+    }
+    
     /**
      * 
      * @param {import("../util/Constants").CommandData} data 
