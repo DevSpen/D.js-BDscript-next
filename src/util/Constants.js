@@ -469,6 +469,12 @@ module.exports.Functions = {
             }
         ]
     },
+    $updateCommands: {
+        key: "$updateCommands",
+        description: "updates all commands that were loader through the command manager.",
+        isProperty: true,
+        returns: "NONE"
+    },
     $setVar: {
         key: "$setVar",
         description: "sets a variable value to given id and type.",
@@ -1116,6 +1122,7 @@ module.exports.Functions = {
 
 /**
  * @typedef {Object} CommandData 
+ * @property {?string} PATH_TO_FILE do not use this property.
  * @property {?string} name
  * @property {?string[]} aliases
  * @property {string} code 

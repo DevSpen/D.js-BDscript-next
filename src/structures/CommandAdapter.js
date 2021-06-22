@@ -20,6 +20,11 @@ module.exports = class CommandAdapter {
         this.type = data.type
 
         /**
+         * @type {string}
+         */
+        this.snowflake = (Math.floor(Math.random() * 999999999999)).toString()
+
+        /**
          * @type {?string}
          */
         this.code = data.code

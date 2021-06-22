@@ -2,6 +2,7 @@ const { Client, Collection } = require("discord.js")
 const { SqliteDatabase } = require("sqlite_master.db")
 const { DefaultBotOptions, AvailableCommandTypes, AvailableEventTypes, CommandToEvent, EventModules } = require("../util/Constants")
 const CommandAdapter = require("./CommandAdapter")
+const CommandManager = require("./CommandManager")
 const DjsBDscriptError = require("./DjsBDscriptError")
 
 module.exports = class Bot {
@@ -29,6 +30,11 @@ module.exports = class Bot {
          * @type {Collection<string, import("discord.js").ApplicationCommandData}
          */
         this.slash_commands = new Collection()
+
+        /**
+         * @type {CommandManager}
+         */
+        this.manager = new CommandManager(this)
 
         /**
          * @type {import("../util/Constants").Commands}
@@ -126,7 +132,7 @@ module.exports = class Bot {
     /**
      * 
      * @param {import("../util/Constants").CommandData} data 
-     * @returns {Bot}
+     * @returns {CommandAdapter}
      */
     command(data = {}) {
         if (AvailableCommandTypes[data.type] === undefined) {
@@ -137,9 +143,9 @@ module.exports = class Bot {
 
         const adapter = new CommandAdapter(data)
 
-        this.commands[event].set(this.commands[event].size, adapter)
+        this.commands[event].set(adapter.snowflake, adapter)
 
-        return this
+        return adapter
     }
 
     /**
