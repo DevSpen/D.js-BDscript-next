@@ -1,10 +1,10 @@
-# This is the next version after D.js-BDscript v5.0.0 (or v5) #
+# This is the next version after D.js-BDscript v5.0.0 #
 
 ## Rewrite Status ##
 🛠️ - Typings <br>
 ✔️ - Variables <br>
 ✔️ - Database <br>
-🛠️ - Full Slash Command Support <br>
+✔️ - Slash Command Support <br>
 🛠️ - All Condensed Functions <br>
 🛠️ - Button Support 
 ### Examples ###

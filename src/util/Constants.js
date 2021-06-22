@@ -454,6 +454,21 @@ module.exports.Functions = {
             }
         ]
     },
+    $slashOption: {
+        key: "$slashOption",
+        description: "retrieves user value on a slash option.",
+        returns: "ANY",
+        emptyReturn: true,
+        params: [
+            {
+                name: "option name",
+                description: "the option name to get the value of.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            }
+        ]
+    },
     $setVar: {
         key: "$setVar",
         description: "sets a variable value to given id and type.",
