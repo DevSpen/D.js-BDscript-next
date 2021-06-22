@@ -13,7 +13,7 @@
 const { Bot } = require("d.js-bdscript")
 
 const bot = new Bot({
-    prefix: "prefix" //or array of prefixes
+    prefix: "prefix", //or array of prefixes
     token: "token" //optional, can also be passed to bot.login()
 })
 
