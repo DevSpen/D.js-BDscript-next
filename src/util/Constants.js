@@ -171,6 +171,13 @@ exports.ClientProperties = {
         description: "the emoji IDs of all guilds.",
         code: c => c.emojis.cache.map(e => e.id).join(", ")
     },
+    commands: {
+        description: "returns all global slash commands.",
+        code: async c => {
+            const cmds = await c.application.commands.fetch()
+            return cmds.map(c => c.id).join(", ")
+        }
+    },
     owners: {
         description: "the owner IDs of this application.",
         code: async c => {
@@ -323,6 +330,20 @@ exports.ServerProperties = {
     channels: {
         description: "returns all the channel IDs for this guild.",
         code: (s) => s.channels.cache.map(e => e.id).join(", ")
+    },
+    commands: {
+        description: "returns all the slash command IDs for this guild.",
+        code: async (g) => {
+            const cmds = await g.commands.fetch()
+            return cmds.map(c => c.id).join(", ")
+        }
+    },
+    bans: {
+        description: "returns all banned user IDs for this guild.",
+        code: async g => {
+            const data = await g.bans.fetch().catch(() => null)
+            return data ? data.map(s => s.user.id).join(", ") : undefined
+        }
     }
 }
 
