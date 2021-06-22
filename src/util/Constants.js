@@ -315,6 +315,90 @@ exports.ServerProperties = {
         description: "the id for this guild.",
         code: (s) => s.id
     },
+    afkChannelID: {
+        description: "The server's AFK channel ID.",
+        code: (s) => s.afkChannelID
+    },
+    afkTimeout: {
+        description: "The server's AFK timeout.",
+        code: (s) => s.afkTimeout
+    },
+    available: {
+        description: "Whether the server is available to access. If it is not available, it indicates a server outage.",
+        code: (s) => s.available
+    },
+    defaultMessageNotifications: {
+        description: "Returns this server's default message notifactions setting.",
+        code: (s) => s.defaultMessageNotifications
+    },
+    description: {
+        description: "Returns this server's description.",
+        code: (s) => s.description
+    },
+    explicitContentFilter: {
+        description: "Returns this server's explicit content filter.",
+        code: (s) => s.explicitContentFilter
+    },
+    name: {
+        name: "This server's name.",
+        code: (s) => s.name
+    },
+    mfaLevel: {
+        name: "This server's MFA level.",
+        code: (s) => s.mfaLevel
+    },
+   ownerID: {
+        name: "This server's owner ID.",
+        code: (s) => s.ownerID
+    },
+   isPartnered: {
+        name: "Whether or not this server is a Discord Partner",
+        code: (s) => s.partnered
+    }, 
+   preferredLocale: {
+        name: "This server's preferred locale.",
+        code: (s) => s.preferredLocale
+    },
+   premiumSubscriptionCount: {
+        name: "This server's boost count.",
+        code: (s) => s.premiumSubscriptionCount
+    }, 
+   premiumTier: {
+        name: "This server's boost level.",
+        code: (s) => s.premiumTier
+    }, 
+    publicUpdatesChannelID: {
+        name: "This server's public updates channel ID.",
+        code: (s) => s.publicUpdatesChannelID
+    }, 
+    region: {
+        name: "This server's region.",
+        code: (s) => s.region
+    }, 
+    rulesChannelID: {
+        name: "This server's rules channel ID.",
+        code: (s) => s.rulesChannelID
+    },
+    systemChannelID: {
+        name: "This server's system channel ID.",
+        code: (s) => s.systemChannelID
+    }, 
+    verificationLevel: {
+        name: "This server's verification level.",
+        code: (s) => s.verificationLevel
+    },
+        verified: {
+        name: "Returns whether or not this server is verified by Discord.",
+        code: (s) => s.verified
+    }, 
+        widgetChannelID: {
+        name: "This server's widget channel ID.",
+        code: (s) => s.widgetChannelID
+    }, 
+        isWidgetEnabled: {
+        name: "Returns whether or not widgets are enabled for this server.",
+        code: (s) => s.widgetEnabled
+    }, 
     emojis: {
         description: "returns all the emote IDs for this guild.",
         code: (s) => s.emojis.cache.map(e => e.id).join(", ")
@@ -401,6 +485,14 @@ exports.UserProperties = {
     createdTimestamp: {
         code: u => u.createdTimestamp,
         description: "the time this user created this account in ms."
+    },
+    lastMessageChannelID: {
+        code: u => u.lastMessageChannelID,
+        description: "The user's last message channel ID."
+    },
+    lastMessageID: {
+        code: u => u.lastMessageID,
+        description: "The user's last message ID."
     }
 }
 
