@@ -8,26 +8,30 @@ const Container = require("../structures/Container")
 exports.DefaultBotOptions = {
     client: {
         intents: Intents.ALL
-    }
+    },
+    databasePath: "./db.sqlite"
 }
 
 exports.AvailableCommandTypes = createEnum([
     "basicCommand",
     "readyCommand",
-    "slashCommand"
+    "slashCommand",
+    "buttonCommand"
 ])
 
 exports.CommandToEvent = {
     basicCommand: "onMessage",
     readyCommand: "onReady",
-    slashCommand: "onSlashInteraction"
+    slashCommand: "onSlashInteraction",
+    buttonCommand: "onButtonInteraction"
 }
 
 exports.EventModules = {
     onMessage: "../events/message",
     onReady: "../events/ready",
     onInteraction: "../events/interaction.js",
-    onSlashInteraction: "../events/interaction.js"
+    onSlashInteraction: "../events/interaction.js",
+    onButtonInteraction: "../events/interaction.js"
 }
 
 exports.AvailableEventTypes = createEnum(Object.keys(exports.EventModules))
@@ -404,6 +408,7 @@ exports.UserProperties = {
  * @typedef {Object} BotOptions
  * @property {ClientOptions} client 
  * @property {string[]|string} prefix
+ * @property {?string} databasePath
  * @property {?string} token
  */
 
@@ -419,6 +424,72 @@ exports.UserProperties = {
  * @type {Object<string, Prototype>}
  */
 module.exports.Functions = {
+    $getVar: {
+        key: "$getVar",
+        description: "gets a variable value from given id and type.",
+        isProperty: false,
+        returns: "ANY",
+        emptyReturn: true,
+        params: [
+            {
+                name: "variable",
+                description: "the variable to get the value of",
+                type: "STRING",
+                required: true,
+                resolveType: "STRING"
+            },
+            {
+                name: "id",
+                description: "the id that was set to this variable.",
+                type: "STRING",
+                required: true,
+                resolveType: "STRING"
+            },
+            {
+                name: "type",
+                description: "optional type for more accurate matching, incase 2 objects have the same ID.",
+                required: true,
+                resolveType: "STRING",
+                type: "STRING"
+            }
+        ]
+    },
+    $setVar: {
+        key: "$setVar",
+        description: "sets a variable value to given id and type.",
+        isProperty: false,
+        returns: "NONE",
+        params: [
+            {
+                name: "variable",
+                description: "the variable to set the value to",
+                type: "STRING",
+                required: true,
+                resolveType: "STRING"
+            },
+            {
+                name: "value",
+                description: "the value to set to this variable.",
+                type: "ANY",
+                required: true,
+                resolveType: "STRING"
+            },
+            {
+                name: "id",
+                description: "the object id to set this var value to.",
+                type: "STRING",
+                required: true,
+                resolveType: "STRING"
+            },
+            {
+                name: "type",
+                description: "optional type for more accurate matching, incase 2 objects have the same ID.",
+                required: true,
+                resolveType: "STRING",
+                type: "STRING"
+            }
+        ]
+    },
     $client: {
         key: "$client",
         isProperty: false,
@@ -458,6 +529,13 @@ module.exports.Functions = {
         ],
         emptyReturn: true
     },
+    $interactionID: {
+        key: "$interactionID",
+        description: "returns the component's custom ID.",
+        returns: "STRING",
+        emptyReturn: true,
+        isProperty: true
+    },
     $role: {
         key: "$role",
         isProperty: false,
@@ -488,6 +566,57 @@ module.exports.Functions = {
             }
         ],
         emptyReturn: true
+    },
+    $addButton: {
+        key: "$addButton",
+        isProperty: false,
+        params: [
+            {
+                name: "link | customID",
+                description: "the url or custom ID to set to this button.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            },
+            {
+                name: "label",
+                description: "the text for this button.",
+                required: true,
+                type: "STRING",
+                resolveType: "STRING"
+            },
+            {
+                name: "style",
+                description: "the type of this button.",
+                required: true,
+                type: "STRING",
+                resolveType: "STRING" 
+            },
+            {
+                name: "emoji",
+                description: "the emoji for this button.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: false,
+                default: ""
+            },
+            {
+                name: "disabled",
+                default: "whether this button should appear disabled.",
+                type: "BOOLEAN",
+                resolveType: "BOOLEAN",
+                required: false,
+                default: false
+            }
+        ],
+        returns: "NONE",
+        description: "adds a button to the last action row.",
+    },
+    $addActionRow: {
+        key: "$addActionRow",
+        description: "add an action row.",
+        isProperty: true,
+        returns: "NONE"
     },
     $wait: {
         key: "$wait",
@@ -748,6 +877,13 @@ module.exports.Functions = {
             }
         ]
     },
+    $messageID: {
+        key: "$messageID",
+        description: "the ID of this message.",
+        returns: "STRING",
+        emptyReturn: true,
+        isProperty: true
+    },
     $executionTime: {
         isProperty: true,
         key: "$executionTime",
@@ -993,7 +1129,7 @@ module.exports.Functions = {
  * @property {CommandAdapter} command 
  * @property {Container} container
  * @property {string[]} args 
- * @property {Message} message
+ * @property {Message|CommandInteraction|MessageComponentInteraction} message
  * @property {boolean} returnContainer
  * @property {Client} client 
  * @property {TextChannel|DMChannel|User|Webhook|Message} mainChannel 

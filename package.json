@@ -12,7 +12,8 @@
   "dependencies": {
     "@discordjs/voice": "^0.5.0",
     "discord.js": "^13.0.0-dev.c850ae10270076c4b2e10b130dd8f88eed4ed201",
-    "ms-utility": "^1.2.0"
+    "ms-utility": "^1.2.0",
+    "sqlite_master.db": "^6.0.3"
   },
   "devDependencies": {
     "cloc": "^2.8.0"

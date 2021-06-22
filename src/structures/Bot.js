@@ -1,4 +1,5 @@
 const { Client, Collection } = require("discord.js")
+const { SqliteDatabase } = require("sqlite_master.db")
 const { DefaultBotOptions, AvailableCommandTypes, AvailableEventTypes, CommandToEvent, EventModules } = require("../util/Constants")
 const CommandAdapter = require("./CommandAdapter")
 const DjsBDscriptError = require("./DjsBDscriptError")
@@ -38,6 +39,52 @@ module.exports = class Bot {
          * @type {import("..").EventTypes[]} 
          */
         this.events = []
+
+        /**
+         * @type {import("sqlite_master.db/src/util/Constants").ColumnData[]}
+         */
+        this.variables = []
+
+        /**
+         * @type {SqliteDatabase}
+         */
+        this.db = new SqliteDatabase({ path: this.options.databasePath })
+
+        this._init()
+    }
+
+    /**
+     * @private
+     */
+    _init() {
+        this.variable([
+            {
+                name: "varType",
+                type: "TEXT"
+            },
+            {
+                name: "id",
+                type: "TEXT",
+                primary: true
+            }
+        ])
+    }
+
+    /**
+     * Creates a variable.
+     * @param {import("sqlite_master.db/src/util/Constants").ColumnData|import("sqlite_master.db/src/util/Constants").ColumnData[]} data the data for this variable. 
+     * @returns {Bot}
+     */
+    variable(data) {
+        if (!Array.isArray(data)) {
+            return this.variable([data])
+        } 
+
+        for (const variable of data) {
+            this.variables.push(variable)
+        }
+
+        return this
     }
 
     /**
@@ -133,9 +180,19 @@ module.exports = class Bot {
      * @param {?string} token
      */
     login(token) {
-        this.client.once("ready", () => {
-            console.log(`Client ready on ${this.client.user.tag}.`)
+        this.db.tables.create({
+            name: "main",
+            columns: this.variables
         })
-        this.client.login(this.options.token ?? token)
+
+        this.db.once("ready", () => {
+            console.log(`Database is ready`)
+            this.client.once("ready", () => {
+                console.log(`Client ready on ${this.client.user.tag}.`)
+            })
+            this.client.login(this.options.token ?? token)
+        })
+
+        this.db.connect()
     }
 }

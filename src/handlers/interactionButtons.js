@@ -1,11 +1,11 @@
-const { Client, CommandInteraction } = require("discord.js");
+const { Client, MessageComponentInteraction } = require("discord.js");
 const Interpreter = require("../main/Interpreter");
 const Bot = require("../structures/Bot");
 
 /**
  * 
  * @param {Client} client 
- * @param {CommandInteraction} interaction 
+ * @param {MessageComponentInteraction} interaction 
  */
 module.exports = (client, interaction) => {
     /**
@@ -13,7 +13,7 @@ module.exports = (client, interaction) => {
      */
     const bot = client.bot 
 
-    const commands = bot.commands.onSlashInteraction 
+    const commands = bot.commands.onButtonInteraction 
 
     if (!commands.size) return undefined
 
@@ -32,7 +32,6 @@ module.exports = (client, interaction) => {
             channel: interaction.channel,
             args: [],
             extras: {
-                options: interaction.options,
                 interaction 
             }
         })

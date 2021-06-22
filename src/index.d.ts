@@ -3,7 +3,7 @@ import { Commands } from "./util/Constants"
 
 declare type Types = "NUMBER" | "ANY" | "BOOLEAN" | "NONE" | "STRING"
 
-declare type CommandTypes = "basicCommand" | "readyCommand" | "slashCommand"
+declare type CommandTypes = "basicCommand" | "readyCommand" | "slashCommand" | "buttonCommand"
 
 declare type ResolveTypes = "MEMBER" |
     "TIME" |

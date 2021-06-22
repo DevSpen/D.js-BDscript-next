@@ -1,10 +1,12 @@
 # This is the next version after D.js-BDscript v5.0.0 (or v5) #
 
 ## Rewrite Status ##
-✔️ - Typings <br>
+🛠️ - Typings <br>
+✔️ - Variables <br>
+✔️ - Database <br>
 🛠️ - Full Slash Command Support <br>
 🛠️ - All Condensed Functions <br>
-❌ - Button Support
+🛠️ - Button Support 
 ### Examples ###
 ```js
 const { Bot } = require("d.js-bdscript")
