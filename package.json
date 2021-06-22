@@ -1,5 +1,5 @@
 {
-  "name": "d.js-bdscript-next",
+  "name": "d.js-bdscript-beta",
   "version": "5.0.0-next",
   "types": "./src/index.d.ts",
   "main": "./src/index.js",
