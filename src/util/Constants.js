@@ -1,5 +1,6 @@
-const { Client, ClientOptions, DMChannel, TextChannel, Webhook, Message, User, Intents, Collection, Guild, Role, GuildMember } = require("discord.js")
+const { Client, ClientOptions, DMChannel, CommandInteractionOption, TextChannel, Webhook, Message, User, Intents, Collection, Guild, Role, GuildMember, Interaction, CommandInteraction, MessageComponentInteraction } = require("discord.js")
 const Interpreter = require("../main/Interpreter")
+const Bot = require("../structures/Bot")
 const CommandAdapter = require("../structures/CommandAdapter")
 const CompileData = require("../structures/CompileData")
 const Container = require("../structures/Container")
@@ -12,23 +13,24 @@ exports.DefaultBotOptions = {
 
 exports.AvailableCommandTypes = createEnum([
     "basicCommand",
-    "readyCommand"
+    "readyCommand",
+    "slashCommand"
 ])
 
 exports.CommandToEvent = {
     basicCommand: "onMessage",
-    readyCommand: "onReady"
+    readyCommand: "onReady",
+    slashCommand: "onSlashInteraction"
 }
 
 exports.EventModules = {
     onMessage: "../events/message",
-    onReady: "../events/ready"
+    onReady: "../events/ready",
+    onInteraction: "../events/interaction.js",
+    onSlashInteraction: "../events/interaction.js"
 }
 
-exports.AvailableEventTypes = createEnum([
-    "onMessage",
-    "onReady"
-])
+exports.AvailableEventTypes = createEnum(Object.keys(exports.EventModules))
 
 /**
  * 
@@ -388,6 +390,8 @@ exports.UserProperties = {
  * @typedef {Object} Commands 
  * @property {Collection<string, CommandAdapter>} onMessage 
  * @property {Collection<string, CommandAdapter>} onReady
+ * @property {Collection<string, CommandAdapter>} onSlashInteraction
+ * @property {Collection<string, CommandAdapter>} onButtonInteraction
  */
 
 /**
@@ -463,6 +467,45 @@ module.exports.Functions = {
             }
         ],
         emptyReturn: true
+    },
+    $wait: {
+        key: "$wait",
+        description: "stops code execution for given time.",
+        isProperty: false,
+        returns: "NONE",
+        emptyReturn: true,
+        params: [
+            {
+                name: "time",
+                description: "the amount of time to stop code execution.",
+                type: "STRING",
+                resolveType: "TIME",
+                required: true
+            }
+        ]
+    },
+    $defer: {
+        key: "$defer",
+        description: "defers the interaction response.",
+        isProperty: false,
+        returns: "NONE",
+        emptyReturn: true,
+        params: [
+            {
+                name: "ephemeral",
+                description: "whether the response will be ephemeral.",
+                type: "BOOLEAN",
+                resolveType: "BOOLEAN",
+                required: true
+            }
+        ]
+    },
+    $ephemeral: {
+        returns: "NONE",
+        emptyReturn: true,
+        isProperty: true,
+        description: "makes this interaction response ephemeral.",
+        key: "$ephemeral"
     },
     $member: {
         key: "$member",
@@ -762,6 +805,37 @@ module.exports.Functions = {
             }
         ]
     },
+    $createSlashCommand: {
+        key: "$createSlashCommand",
+        description: "creates a global or guild slash command.",
+        isProperty: false,
+        returns: "STRING",
+        emptyReturn: true,
+        params: [
+            {
+                name: "guildID | global",
+                description: "if global, the slash command will be available for every guild your bot is in, otherwise only available to given guild ID.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true,
+            },
+            {
+                name: "slash command name",
+                description: "the slash command name that was created through ``Bot.createSlashCommandData()`.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            },
+            {
+                name: "return command ID",
+                description: "whether to return the newly created command's ID.",
+                type: "BOOLEAN",
+                resolveType: "BOOLEAN",
+                required: false,
+                default: false
+            }
+        ]
+    }, 
     $reply: {
         key: "$reply",
         description: "whether this message is a reply.",
@@ -886,7 +960,15 @@ module.exports.Functions = {
  */
 
 /**
+ * @typedef {Object} ExtrasData 
+ * @property {Collection<string, CommandInteractionOption>} options
+ * @property {CommandInteraction|MessageComponentInteraction} interaction 
+ */
+
+/**
  * @typedef {Object} ExecutionData 
+ * @property {Bot} bot 
+ * @property {ExtrasData} extras 
  * @property {CommandAdapter} command 
  * @property {Container} container
  * @property {string[]} args 

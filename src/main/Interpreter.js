@@ -12,6 +12,8 @@ module.exports = async (client, data) => {
 
     data.channel = data.message?.channel ?? data.channel ?? data.mainChannel 
 
+    data.bot = client.bot
+    
     data.mainChannel = data.message?.channel ?? data.channel
 
     data.container = new Container(data.command)

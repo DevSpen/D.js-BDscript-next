@@ -86,6 +86,7 @@ module.exports = class Container {
 
         const m = await (channel ?? this.referenceChannel)[this.sendOption]?.({
             content,
+            ephemeral: this.replyOptions.isReplyEphemeral, 
             embeds: this.embeds,
             components: this.components,
             allowedMentions 
@@ -116,6 +117,6 @@ module.exports = class Container {
     }
 
     get sendOption() {
-        return this.replyOptions.replyType ?? "send"
+        return this.replyOptions.isReplyWaiting ? "editReply" : this.replyOptions.replyType ?? "send"
     }
 }

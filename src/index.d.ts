@@ -3,7 +3,7 @@ import { Commands } from "./util/Constants"
 
 declare type Types = "NUMBER" | "ANY" | "BOOLEAN" | "NONE" | "STRING"
 
-declare type CommandTypes = "basicCommand" | "readyCommand"
+declare type CommandTypes = "basicCommand" | "readyCommand" | "slashCommand"
 
 declare type ResolveTypes = "MEMBER" |
     "TIME" |
@@ -20,7 +20,7 @@ declare type ResolveTypes = "MEMBER" |
 declare type BDscriptErrors = "INVALID_COMMAND_TYPE" | "INVALID_EVENT_TYPE" | "EVENT_ALREADY_REGISTERED" |
     "SYNTAX_ERROR" | "SLASH_COMMAND_ALREADY_EXISTS"
 
-declare type EventTypes = "onReady" | "onMessage"
+declare type EventTypes = "onReady" | "onMessage" | "onInteraction"
 
 interface BotOptions {
     token?: string
