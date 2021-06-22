@@ -1,13 +1,14 @@
 {
-  "name": "d.js-bdscript",
+  "name": "d.js-bdscript-next",
   "version": "5.0.0-next",
   "types": "./src/index.d.ts",
   "main": "./src/index.js",
   "scripts": {
+    "update": "git add . && git commit -m \"update repo\" && git push -u origin master",
     "test": "tsc src/tests/test.ts && node src/tests/test.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "ruben40000",
+  "license": "MIT",
   "dependencies": {
     "@discordjs/voice": "^0.5.0",
     "discord.js": "^13.0.0-dev.c850ae10270076c4b2e10b130dd8f88eed4ed201",
@@ -16,5 +17,5 @@
   "devDependencies": {
     "cloc": "^2.8.0"
   },
-  "description": "a nice package"
+  "description": "rewrite."
 }

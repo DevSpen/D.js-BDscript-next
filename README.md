@@ -2,7 +2,7 @@
 
 main file
 ```js
-const Bot = require("d.js-bdscript")
+const { Bot } = require("d.js-bdscript")
 
 const bot = new Bot({
     prefix: "prefix" //or array of prefixes

@@ -1,3 +1,3 @@
-import Bot from "./structures/Bot";
+const Bot = require("./structures/Bot");
 
-module.exports = Bot
+exports.Bot = Bot
