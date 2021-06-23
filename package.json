@@ -19,7 +19,6 @@
   "devDependencies": {
     "cloc": "^2.8.0",
     "ffmpeg": "^0.0.4",
-    "ffmpeg-static": "^4.4.0",
     "libsodium-wrappers": "^0.7.9",
     "opusscript": "^0.0.8",
     "youtube-dl-exec": "^1.2.4",
