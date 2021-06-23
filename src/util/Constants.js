@@ -167,9 +167,33 @@ module.exports.RoleProperties = {
  * @type {Object<string, ClientPropertyData>}
  */
 module.exports.ClientProperties = {
-    id: {
+  id: {
         description: "the id of the client.",
         code: c => c.user.id
+    },
+  token: {
+        description: "The client's token. Use this property with caution!",
+        code: c => c.token
+    },
+  tag: {
+        description: "The bot's tag (User#0000).",
+        code: c => c.user.tag
+    },
+   uptime: {
+        description: "How long it has been since the client last was ready in milliseconds.",
+        code: c => c.uptime
+    },
+   discriminator: {
+        description: "The bot's discrmnator.",
+        code: c => c.user.discriminator
+    },
+   username: {
+        description: "The bot's username.",
+        code: c => c.user.username
+    },
+   ping: {
+        description: "The bot's ping in milliseconds.",
+        code: c => c.ws.ping
     },
     users: {
         description: "the cached user IDs.",
