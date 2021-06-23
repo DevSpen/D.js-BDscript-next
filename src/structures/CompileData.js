@@ -93,10 +93,10 @@ module.exports = class CompileData {
      * @type {string}
      */
     get image() {
-        if (this.mainFunction.isProperty) {
+        if (this.mainFunction.isProperty && !this.mainFunction.optional) {
             return this.total
         } else {
-            if (this.inside === undefined) {
+            if (this.inside === undefined || this.inside === null) {
                 return this.total
             }
             let image = `${this.mainFunction.key}[${this.inside}]`
@@ -236,7 +236,7 @@ module.exports = class CompileData {
             const param = this.mainFunction.params[i]
             let response = arr[i]
 
-            if (param.required && !response) {
+            if (param.required && (response === undefined || response === null)) {
                 return this.sendError(data.mainChannel, `:x: Missing arguments in \`${this.image}\`!`)
             }
 

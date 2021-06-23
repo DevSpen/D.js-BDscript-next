@@ -1,5 +1,5 @@
-const { VoiceConnection, AudioPlayer, PlayerSubscription } = require("@discordjs/voice")
-const { Client, ClientOptions, DMChannel, CommandInteractionOption, TextChannel, Webhook, Message, User, Intents, Collection, Guild, Role, GuildMember, Interaction, CommandInteraction, MessageComponentInteraction, VoiceChannel } = require("discord.js")
+const { VoiceConnection, AudioPlayer, PresenceStatus, PlayerSubscription } = require("@discordjs/voice")
+const { Client, ClientOptions, DMChannel, CommandInteractionOption, TextChannel, Webhook, Message, User, Intents, Collection, Guild, Role, GuildMember, Interaction, CommandInteraction, MessageComponentInteraction, VoiceChannel, Presence } = require("discord.js")
 const Interpreter = require("../main/Interpreter")
 const Bot = require("../structures/Bot")
 const CommandAdapter = require("../structures/CommandAdapter")
@@ -193,6 +193,22 @@ module.exports.ClientProperties = {
             const cmds = await c.application.commands.fetch()
             return cmds.map(c => c.id).join(", ")
         }
+    },
+    guildCount: {
+        description: "the guild count.",
+        code: c => c.guilds.cache.size  
+    },
+    userCount: {
+        description: "the total user count.",
+        code: c => c.users.cache.size  
+    },
+    botCount: {
+        description: "the total bot count.",
+        code: c => c.users.cache.filter(c => c.bot).size  
+    },
+    channelCount: {
+        description: "the total channel count.",
+        code: c => c.channels.cache.size
     },
     owners: {
         description: "the owner IDs of this application.",
@@ -614,6 +630,20 @@ module.exports.Functions = {
                 required: true,
                 resolveType: "STRING",
                 type: "STRING"
+            }
+        ]
+    },
+    $numberSeparator: {
+        key: "$numberSeparator",
+        description: "separates thousands in the number.",
+        returns: "NUMBER",
+        params: [
+            {
+                name: "number",
+                description: "the number to separate thousands of.",
+                type: "NUMBER",
+                resolveType: "NUMBER",
+                required: true
             }
         ]
     },
@@ -1077,6 +1107,151 @@ module.exports.Functions = {
             }
         ]
     },
+    $color: {
+        key: "$color",
+        description: "set an embed color to given embed index.",
+        returns: "NONE",
+        params: [
+            {
+                name: "index",
+                resolveType: "NUMBER",
+                type: "NUMBER",
+                description: "the index of the embed to add this data to.",
+                required: true
+            },
+            {
+                name: "color",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the color hex or int to add to this embed.",
+            }
+        ]
+    },
+    $replaceText: {
+        key: "$replaceText",
+        description: "replaces matches in text with something else.",
+        isProperty: false,
+        returns: "STRING",
+        emptyReturn: true,
+        params: [
+            {
+                name: "text",
+                description: "the text to replace results from",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true 
+            },
+            {
+                name: "match",
+                description: "letter or word to replace",
+                resolveType: "STRING",
+                type: "STRING",
+                required: true
+            },
+            {
+                name: "to",
+                description: "what to replace results to",
+                type: "ANY",
+                resolveType: "STRING",
+                required: true 
+            }
+        ]
+    },
+    $checkCondition: {
+        key: "$checkCondition",
+        returns: "BOOLEAN",
+        description: "checks whether a condition is true.",
+        params: [
+            {
+                name: "condition",
+                description: "the condition to check.",
+                type: "ANY",
+                resolveType: "STRING",
+                required: true
+            }
+        ]
+    },
+    $onlyIf: {
+        key: "$onlyIf",
+        description: "checks whether a condition is true, returns a code if false.",
+        emptyReturn: true,
+        returns: "NONE",
+        params: [
+            {
+                name: "condition",
+                description: "condition to check for.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true 
+            }, 
+            {
+                name: "error message",
+                description: "the message to execute if the condition is false.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: false
+            }
+        ]
+    },
+    $commandInfo: {
+        key: "$commandInfo",
+        description: "returns command info from given command.",
+        isProperty: false,
+        returns: "ANY",
+        emptyReturn: true,
+        params: [
+            {
+                name: "command type",
+                description: "the type of the command, i.g `basicCommand`",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            }, 
+            {
+                name: "command name",
+                description: "the name of the command",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            },
+            {
+                name: "property",
+                description: "the property to return from this command",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            }
+        ]
+    },
+    $addField: {
+        key: "$addField",
+        description: "set an embed field to given embed index.",
+        returns: "NONE",
+        params: [
+            {
+                name: "index",
+                resolveType: "NUMBER",
+                type: "NUMBER",
+                description: "the index of the embed to add this data to.",
+                required: true
+            },
+            {
+                name: "title",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the field title to add to this embed.",
+            },
+            {
+                name: "value",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the value to add to this embed field.",
+            }
+        ]
+    },
     $title: {
         key: "$title",
         description: "set an embed title to given embed index.",
@@ -1102,6 +1277,169 @@ module.exports.Functions = {
                 type: "STRING",
                 required: false,
                 description: "the url to add to this embed title.",
+            }
+        ]
+    },
+    $thumbnail: {
+        key: "$thumbnail",
+        description: "set an embed thumbnail to given embed index.",
+        returns: "NONE",
+        params: [
+            {
+                name: "index",
+                resolveType: "NUMBER",
+                type: "NUMBER",
+                description: "the index of the embed to add this data to.",
+                required: true
+            },
+            {
+                name: "url",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the thumbnail to add to this embed.",
+            }
+        ]
+    },
+    $image: {
+        key: "$image",
+        description: "set an embed image to given embed index.",
+        returns: "NONE",
+        params: [
+            {
+                name: "index",
+                resolveType: "NUMBER",
+                type: "NUMBER",
+                description: "the index of the embed to add this data to.",
+                required: true
+            },
+            {
+                name: "url",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the image url to add to this embed.",
+            }
+        ]
+    },
+    $attachment: {
+        key: "$attachment",
+        description: "add a file attachment to the response.",
+        returns: "NONE",
+        params: [
+            {
+                name: "name",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the name of this attachment, must include the file extension.",
+            },
+            {
+                name: "url",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the url of this attachment.",
+            }
+        ]
+    },
+    $author: {
+        key: "$author",
+        description: "set an embed author to given embed index.",
+        returns: "NONE",
+        params: [
+            {
+                name: "index",
+                resolveType: "NUMBER",
+                type: "NUMBER",
+                description: "the index of the embed to add this data to.",
+                required: true
+            },
+            {
+                name: "text",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the author title to add to this embed author.",
+            },
+            {
+                name: "icon",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the author icon to add to this embed author.",
+            },
+            {
+                name: "hyperlink",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the hyerlink url to add to this embed author.",
+            }
+        ]
+    },
+    $let: {
+        key: "$let",
+        description: "sets a variable value to a let variable.",
+        returns: "NONE",
+        emptyReturn: true,
+        params: [
+            {
+                name: "variable",
+                description: "the variable name.",
+                required: true,
+                resolveType: "STRING",
+                type: "STRING"
+            },
+            {
+                name: "value",
+                description: "the value for this local variable.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            }
+        ]
+    },
+    $get: {
+        key: "$get",
+        description: "gets a value from a let variable.",
+        returns: "ANY",
+        emptyReturn: true,
+        params: [
+            {
+                name: "variable",
+                description: "the variable name.",
+                required: true,
+                resolveType: "STRING",
+                type: "STRING"
+            }
+        ]
+    },
+    $footer: {
+        key: "$footer",
+        description: "set an embed footer to given embed index.",
+        returns: "NONE",
+        params: [
+            {
+                name: "index",
+                resolveType: "NUMBER",
+                type: "NUMBER",
+                description: "the index of the embed to add this data to.",
+                required: true
+            },
+            {
+                name: "text",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the footer text to add to this embed.",
+            },
+            {
+                name: "icon",
+                resolveType: "STRING",
+                type: "STRING",
+                required: false,
+                description: "the footer icon to add to this embed.",
             }
         ]
     },
@@ -1309,6 +1647,17 @@ module.exports.loopTypes = createEnum([
 /**
  * 
  * @typedef {import("..").ResolveTypes} ResolveTypes
+ */
+
+/**
+ * @typedef {Object} StatusData 
+ * @property {string} name the status name. 
+ * @property {PresenceStatus} presence the status for this bot.
+ * @property {number} duration status duration in ms.
+ * @property {boolean} afk whether the client is afk. 
+ * @property {number} shardID the shard to put this status on.
+ * @property {string} url the stream url.
+ * @property {string} type the type for this status
  */
 
 /**

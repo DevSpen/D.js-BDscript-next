@@ -7,12 +7,13 @@ module.exports = class CommandAdapter {
     /**
      * 
      * @param {import("../Util/Constants").CommandData} data 
+     * @param {?string} code
      */
-    constructor(data = {}) {
+    constructor(data = {}, code) {
         /**
          * @type {import("../Util/Constants").CompiledObject}
          */
-        this.compiled = Compiler(data.code)
+        this.compiled = Compiler(code ?? data.code)
 
         /**
          * @type {string}
@@ -27,7 +28,7 @@ module.exports = class CommandAdapter {
         /**
          * @type {?string}
          */
-        this.code = data.code
+        this.code = code ?? data.code
 
         /**
          * @type {import("../Util/Constants").CommandData}

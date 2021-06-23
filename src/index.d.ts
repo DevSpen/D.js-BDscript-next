@@ -1,9 +1,9 @@
 import { AudioResource, PlayerSubscription, VoiceConnection } from "@discordjs/voice"
-import { ApplicationCommandData, Client, ClientOptions, Collection } from "discord.js"
+import { ApplicationCommandData, Client, ClientOptions, Collection, Status } from "discord.js"
 import { SqliteDatabase } from "sqlite_master.db"
 import { ColumnData } from "sqlite_master.db/src/util/Constants"
 import CommandAdapter from "./structures/CommandAdapter"
-import { Commands, TrackData, VoiceData } from "./util/Constants"
+import { Commands, StatusData, TrackData, VoiceData } from "./util/Constants"
 
 declare type Types = "NUMBER" | "ANY" | "BOOLEAN" | "NONE" | "STRING"
 
@@ -25,6 +25,20 @@ declare type BDscriptErrors = "INVALID_COMMAND_TYPE" | "INVALID_EVENT_TYPE" | "E
     "SYNTAX_ERROR" | "SLASH_COMMAND_ALREADY_EXISTS"
 
 declare type EventTypes = "onReady" | "onMessage" | "onInteraction" | "onMusicStart" | "onMusicEnd"
+
+export class StatusManager {
+    bot: Bot
+    current: number
+    looping: boolean
+    status: StatusData[]
+
+    constructor(bot: Bot)
+
+    public start(): boolean
+    private cycle(): void 
+    public add(status: StatusData | StatusData[]): this 
+}
+
 
 interface BotOptions {
     token?: string
@@ -76,6 +90,7 @@ interface CommandData {
 }
 export class Bot {
     audio: AudioManager
+    status: StatusManager
     events: EventTypes[]
     manager: CommandManager
     client: Client 

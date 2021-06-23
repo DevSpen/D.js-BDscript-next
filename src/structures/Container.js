@@ -1,4 +1,4 @@
-const { MessageEmbed, Webhook, TextChannel, DMChannel, CommandInteraction, Message, MessageActionRow, User } = require("discord.js")
+const { MessageEmbed, Webhook, TextChannel, DMChannel, CommandInteraction, Message, MessageActionRow, User, MessageAttachment } = require("discord.js")
 const CommandAdapter = require("./CommandAdapter")
 
 module.exports = class Container {
@@ -30,6 +30,16 @@ module.exports = class Container {
          * @type {Object<string, any>}
          */
         this.data = {}
+
+        /**
+         * @type {Object<string, any>}
+         */
+        this.keywords = {}
+
+        /**
+         * @type {MessageAttachment[]}
+         */
+        this.files = []
 
         /**
          * @type {MessageActionRow[]}
@@ -78,7 +88,7 @@ module.exports = class Container {
      * @param {Webhook|TextChannel|DMChannel|CommandInteraction|Message|User} channel  
      */
     async execute(content, channel) {
-        if (!this.referenceChannel) return undefined
+        if (!this.referenceChannel && !channel) return undefined
 
         const allowedMentions = {
             repliedUser: this.replyOptions.replyMention
@@ -87,6 +97,7 @@ module.exports = class Container {
         const m = await (channel ?? this.referenceChannel)[this.sendOption]?.({
             content,
             ephemeral: this.replyOptions.isReplyEphemeral, 
+            files: this.files, 
             embeds: this.embeds,
             components: this.components,
             allowedMentions 
@@ -94,6 +105,7 @@ module.exports = class Container {
 
         this.components = []
         this.embeds = []
+        this.files = []
         this.replyOptions.isReply = false
         this.replyOptions.replyMention = false
         this.replyOptions.isReplyEphemeral = false

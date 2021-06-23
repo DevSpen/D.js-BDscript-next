@@ -5,6 +5,7 @@ const AudioManager = require("./AudioManager")
 const CommandAdapter = require("./CommandAdapter")
 const CommandManager = require("./CommandManager")
 const DjsBDscriptError = require("./DjsBDscriptError")
+const StatusManager = require("./StatusManager")
 
 module.exports = class Bot {
     /**
@@ -21,6 +22,11 @@ module.exports = class Bot {
          * @type {AudioManager} 
          */
         this.audio = new AudioManager(this)
+
+        /**
+         * @type {StatusManager}
+         */
+        this.status = new StatusManager(this)
 
         /**
          * @type {Client} 
@@ -201,6 +207,7 @@ module.exports = class Bot {
             console.log(`Database is ready`)
             this.client.once("ready", () => {
                 console.log(`Client ready on ${this.client.user.tag}.`)
+                this.status.start()
             })
             this.client.login(this.options.token ?? token)
         })
