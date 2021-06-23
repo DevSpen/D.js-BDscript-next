@@ -3,5 +3,5 @@ module.exports = async (fn, data) => {
 
     if (array === undefined) return undefined
 
-    return fn.deflate(array.reduce((x, y) => Number(x) * Number(y)))
+    return fn.deflate(array.reduce((x, y) => x * y, 0))
 } 
