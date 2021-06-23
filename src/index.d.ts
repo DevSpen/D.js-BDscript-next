@@ -44,7 +44,8 @@ interface BotOptions {
     token?: string
     prefix: string[] | string
     client?: ClientOptions 
-    databasePath?: string 
+    databasePath?: string,
+    debug: "LOG" | "NONE"
 }
 
 export class AudioManager {

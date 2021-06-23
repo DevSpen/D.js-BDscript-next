@@ -97,6 +97,10 @@ module.exports.MemberProperties = {
         description: "the user's highest role ID.",
         code: m => m.roles.highest.id
     },
+    permissions: {
+        code: m => m.permissions.toArray().join(", "),
+        description: "returns key permissions for this member."
+    },
     roles: {
         description: "the role IDs of this user.",
         code: m => m.roles.cache.map(r => r.id).join(", ")
@@ -120,6 +124,10 @@ module.exports.MemberProperties = {
  * @type {Object<string, RolePropertyData>}
  */
 module.exports.RoleProperties = {
+    permissions: {
+        code: r => r.permissions.toArray().join(", "),
+        description: "returns key permissions for this role."
+    },
     name: {
         code: (r) => r.name,
         description: "the name of this role."
@@ -356,7 +364,7 @@ module.exports.ServerProperties = {
         code: (s) => s.available
     },
     defaultMessageNotifications: {
-        description: "Returns this server's default message notifactions setting.",
+        description: "Returns this server's default message notifications setting.",
         code: (s) => s.defaultMessageNotifications
     },
     description: {
@@ -375,23 +383,24 @@ module.exports.ServerProperties = {
         name: "This server's MFA level.",
         code: (s) => s.mfaLevel
     },
-   ownerID: {
+    ownerID: {
         name: "This server's owner ID.",
         code: (s) => s.ownerID
     },
-   isPartnered: {
+
+    isPartnered: {
         name: "Whether or not this server is a Discord Partner",
         code: (s) => s.partnered
     }, 
-   preferredLocale: {
+    preferredLocale: {
         name: "This server's preferred locale.",
         code: (s) => s.preferredLocale
     },
-   premiumSubscriptionCount: {
+    premiumSubscriptionCount: {
         name: "This server's boost count.",
         code: (s) => s.premiumSubscriptionCount
     }, 
-   premiumTier: {
+    premiumTier: {
         name: "This server's boost level.",
         code: (s) => s.premiumTier
     }, 
@@ -406,6 +415,10 @@ module.exports.ServerProperties = {
     rulesChannelID: {
         name: "This server's rules channel ID.",
         code: (s) => s.rulesChannelID
+    },
+    features: {
+        name: "Returns this server's key features.",
+        code: g => g.features.join(", ")
     },
     systemChannelID: {
         name: "This server's system channel ID.",
@@ -630,6 +643,63 @@ module.exports.Functions = {
                 required: true,
                 resolveType: "STRING",
                 type: "STRING"
+            }
+        ]
+    },
+    $math: {
+        key: "$math",
+        description: "creates a math operation.",
+        returns: "NUMBER",
+        params: [
+            {
+                name: "operation",
+                description: "the operation to solve.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            }
+        ]
+    },
+    $checkContains: {
+        key: "$checkContains",
+        description: "checks whether given string contains one of the provided words.",
+        returns: "BOOLEAN",
+        params: [
+            {
+                name: "text",
+                description: "text to check for.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            },
+            {
+                name: "words",
+                description: "word or words to check for, separated by `;`.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            }
+        ]
+    },
+    $toTitle: {
+        key: "$toTitle",
+        description: "converts given text into a title.",
+        returns: "STRING",
+        params: [
+            {
+                name: "text",
+                description: "text to convert to title.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true 
+            },
+            {
+                name: "separator",
+                description: "optional separator.",
+                default: "_",
+                type: "STRING",
+                resolveType :"STRING",
+                required: false
             }
         ]
     },
@@ -1784,3 +1854,4 @@ module.exports.condition = (value1, operator, value2) => {
 
     return true
 }
+
