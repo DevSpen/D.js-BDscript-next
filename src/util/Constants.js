@@ -1024,7 +1024,7 @@ module.exports.Functions = {
             close: "]"
         }
     },
-      $sub: {
+    $sub: {
         key: "$sub",
         description: "Substracts the provided numbers.",
         params: [
@@ -1044,7 +1044,7 @@ module.exports.Functions = {
             close: "]"
         }
     },
-     $multi: {
+    $multi: {
         key: "$multi",
         description: "Multiplies the provided numbers.",
         params: [
@@ -1064,7 +1064,7 @@ module.exports.Functions = {
             close: "]"
         }
     },
-      $divide: {
+    $divide: {
         key: "$divide",
         description: "Divides the provided numbers.",
         params: [
