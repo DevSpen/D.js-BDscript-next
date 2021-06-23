@@ -6,6 +6,7 @@
 ✔️ - Database <br>
 ❌ - All Functions <br>
 ❌ - Custom Prefixes <br>
+🛠️ - Full Embed Support <br>
 ✔️ - Status Manager <br>
 ✔️ - Slash Command Support <br>
 ❌ - All Condensed Functions <br>
