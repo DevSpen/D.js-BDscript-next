@@ -1006,11 +1006,91 @@ module.exports.Functions = {
     },
     $sum: {
         key: "$sum",
-        description: "sum multiple numbers.",
+        description: "Returns the sum of the provided numbers.",
         params: [
             {
                 name: "numbers",
-                description: "numbers to sum, separated by `;`.",
+                description: "The numbers to add, separated by `;`.",
+                type: "NUMBER",
+                required: true,
+                rest: true, 
+                resolveType: "NUMBER"
+            }
+        ],
+        isProperty: false,
+        returns: "NUMBER",
+        brackets: {
+            open: "[",
+            close: "]"
+        }
+    },
+      $sub: {
+        key: "$sub",
+        description: "Substracts the provided numbers.",
+        params: [
+            {
+                name: "numbers",
+                description: "The number to subtract, separated by `;`.",
+                type: "NUMBER",
+                required: true,
+                rest: true, 
+                resolveType: "NUMBER"
+            }
+        ],
+        isProperty: false,
+        returns: "NUMBER",
+        brackets: {
+            open: "[",
+            close: "]"
+        }
+    },
+     $multi: {
+        key: "$multi",
+        description: "Multiplies the provided numbers.",
+        params: [
+            {
+                name: "numbers",
+                description: "The numbers to multiply, separated by `;`.",
+                type: "NUMBER",
+                required: true,
+                rest: true, 
+                resolveType: "NUMBER"
+            }
+        ],
+        isProperty: false,
+        returns: "NUMBER",
+        brackets: {
+            open: "[",
+            close: "]"
+        }
+    },
+      $divide: {
+        key: "$divide",
+        description: "Divides the provided numbers.",
+        params: [
+            {
+                name: "numbers",
+                description: "The numbers to divide, separated by `;`.",
+                type: "NUMBER",
+                required: true,
+                rest: true, 
+                resolveType: "NUMBER"
+            }
+        ],
+        isProperty: false,
+        returns: "NUMBER",
+        brackets: {
+            open: "[",
+            close: "]"
+        }
+    },
+       $modulo: {
+        key: "$modulo",
+        description: "Returns remainder between numbers.",
+        params: [
+            {
+                name: "numbers",
+                description: "The numbers, separated by `;`.",
                 type: "NUMBER",
                 required: true,
                 rest: true, 
