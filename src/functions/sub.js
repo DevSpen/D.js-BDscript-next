@@ -1,7 +1,7 @@
-module.exports = async (fn, data) => {
-    const array = await fn.resolveArray(data)
+module.exports = async (fn, d) => {
+    const array = await fn.resolveArray(d)
 
     if (array === undefined) return undefined
 
-    return fn.deflate(array.reduce((x, y) => Number(x) - Number(y)))
-} 
+    return fn.deflate(array.reduce((x, y) => x - y, 0))
+}
