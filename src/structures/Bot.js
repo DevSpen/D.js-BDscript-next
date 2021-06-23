@@ -1,6 +1,7 @@
 const { Client, Collection } = require("discord.js")
 const { SqliteDatabase } = require("sqlite_master.db")
 const { DefaultBotOptions, AvailableCommandTypes, AvailableEventTypes, CommandToEvent, EventModules } = require("../util/Constants")
+const AudioManager = require("./AudioManager")
 const CommandAdapter = require("./CommandAdapter")
 const CommandManager = require("./CommandManager")
 const DjsBDscriptError = require("./DjsBDscriptError")
@@ -15,6 +16,11 @@ module.exports = class Bot {
          * @type {import("../util/Constants").BotOptions}
          */
         this.options = this._validateOptions(Object.assign(DefaultBotOptions, options))
+
+        /**
+         * @type {AudioManager} 
+         */
+        this.audio = new AudioManager(this)
 
         /**
          * @type {Client} 

@@ -1,13 +1,16 @@
-const { makeID, findFunctions } = require("../Structures/CompileData")
-const CompileData = require("../Structures/CompileData")
-const Definitions = require("../Util/Constants").Functions
+const { makeID, findFunctions } = require("../structures/CompileData")
+const CompileData = require("../structures/CompileData")
+const Definitions = require("../util/Constants")
 const DjsBDscriptError = require("../structures/DjsBDscriptError")
-const keys = Object.keys(Definitions).sort((x, y) => y.length - x.length)
+var keys = null
+
 /**
  * 
  * @param {string} code 
  */
 module.exports = (code) => {
+    keys = keys ?? Object.keys(Definitions.Functions).sort((x, y) => y.length - x.length)
+    
     /**
      * @type {import("../Util/Constants").CompiledObject}
      */
@@ -23,7 +26,7 @@ module.exports = (code) => {
             continue
         } 
 
-        const fn = Definitions[key]
+        const fn = Definitions.Functions[key]
 
         if (!fn.isProperty) {
             const r = code.split(fn.key).length - 1 

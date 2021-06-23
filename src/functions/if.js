@@ -1,4 +1,4 @@
-const CompileData = require("../Structures/CompileData");
+const CompileData = require("../structures/CompileData");
 const { MemberProperties, OPERATORS, condition } = require("../util/Constants");
 
 /**

@@ -1,5 +1,5 @@
 const { MessageActionRow } = require("discord.js");
-const CompileData = require("../Structures/CompileData");
+const CompileData = require("../structures/CompileData");
 const { ClientProperties } = require("../util/Constants");
 
 /**

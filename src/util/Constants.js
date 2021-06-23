@@ -1,40 +1,48 @@
-const { Client, ClientOptions, DMChannel, CommandInteractionOption, TextChannel, Webhook, Message, User, Intents, Collection, Guild, Role, GuildMember, Interaction, CommandInteraction, MessageComponentInteraction } = require("discord.js")
+const { VoiceConnection, AudioPlayer, PlayerSubscription } = require("@discordjs/voice")
+const { Client, ClientOptions, DMChannel, CommandInteractionOption, TextChannel, Webhook, Message, User, Intents, Collection, Guild, Role, GuildMember, Interaction, CommandInteraction, MessageComponentInteraction, VoiceChannel } = require("discord.js")
 const Interpreter = require("../main/Interpreter")
 const Bot = require("../structures/Bot")
 const CommandAdapter = require("../structures/CommandAdapter")
 const CompileData = require("../structures/CompileData")
 const Container = require("../structures/Container")
+const Track = require("../structures/Track")
 
-exports.DefaultBotOptions = {
+module.exports.DefaultBotOptions = {
     client: {
         intents: Intents.ALL
     },
     databasePath: "./db.sqlite"
 }
 
-exports.AvailableCommandTypes = createEnum([
+module.exports.AvailableCommandTypes = createEnum([
     "basicCommand",
     "readyCommand",
     "slashCommand",
-    "buttonCommand"
+    "buttonCommand",
+    "musicEndCommand",
+    "musicStartCommand"
 ])
 
-exports.CommandToEvent = {
+module.exports.CommandToEvent = {
     basicCommand: "onMessage",
     readyCommand: "onReady",
     slashCommand: "onSlashInteraction",
+    musicEndCommand: "onMusicEnd",
+    musicStartCommand: "onMusicStart", 
     buttonCommand: "onButtonInteraction"
 }
 
-exports.EventModules = {
+module.exports.EventModules = {
     onMessage: "../events/message",
     onReady: "../events/ready",
-    onInteraction: "../events/interaction.js",
-    onSlashInteraction: "../events/interaction.js",
-    onButtonInteraction: "../events/interaction.js"
+    onInteraction: "../events/interaction",
+    onSlashInteraction: "../events/interaction",
+    onButtonInteraction: "../events/interaction",
+    onMusicEnd: "../events/guildMusicEnd",
+    onMusicStart: "../events/guildMusicStart", 
 }
 
-exports.AvailableEventTypes = createEnum(Object.keys(exports.EventModules))
+module.exports.AvailableEventTypes = createEnum(Object.keys(exports.EventModules))
 
 /**
  * 
@@ -52,10 +60,14 @@ exports.AvailableEventTypes = createEnum(Object.keys(exports.EventModules))
 /**
  * @type {Object<string, MemberPropertyData>}
  */
-exports.MemberProperties = {
+module.exports.MemberProperties = {
     guildID: {
         description: "the guild this member is in",
         code: m => m.guild.id
+    },
+    voiceChannelID: {
+        description: "returns the voice channel ID of this member, if any",
+        code: m => m.voice.channelID
     },
     nickname: {
         description: "the nickname of this user, if any.",
@@ -107,7 +119,7 @@ exports.MemberProperties = {
 /**
  * @type {Object<string, RolePropertyData>}
  */
-exports.RoleProperties = {
+module.exports.RoleProperties = {
     name: {
         code: (r) => r.name,
         description: "the name of this role."
@@ -154,7 +166,7 @@ exports.RoleProperties = {
  /**
  * @type {Object<string, ClientPropertyData>}
  */
-exports.ClientProperties = {
+module.exports.ClientProperties = {
     id: {
         description: "the id of the client.",
         code: c => c.user.id
@@ -211,7 +223,7 @@ exports.ClientProperties = {
  /**
  * @type {Object<string, ChannelPropertyData>}
  */
-exports.ChannelProperties = {
+module.exports.ChannelProperties = {
     name: {
         code: c => c.name,
         description: "the name of this channel."
@@ -310,7 +322,7 @@ function serverFunc (guild) {}
 /**
  * @type {Object<string, ServerPropertyData>}
  */
-exports.ServerProperties = {
+module.exports.ServerProperties = {
     id: {
         description: "the id for this guild.",
         code: (s) => s.id
@@ -451,7 +463,7 @@ function userFunc (user) {}
 /**
  * @type {Object<string, UserPropertyData>}
  */
-exports.UserProperties = {
+module.exports.UserProperties = {
     id: {
         code: (u) => u.id, 
         description: "the ID of this user.",
@@ -507,6 +519,8 @@ exports.UserProperties = {
 /**
  * @typedef {Object} Commands 
  * @property {Collection<string, CommandAdapter>} onMessage 
+ * @property {Collection<string, CommandAdapter>} onMusicStart
+ * @property {Collection<string, CommandAdapter>} onMusicEnd
  * @property {Collection<string, CommandAdapter>} onReady
  * @property {Collection<string, CommandAdapter>} onSlashInteraction
  * @property {Collection<string, CommandAdapter>} onButtonInteraction
@@ -762,6 +776,22 @@ module.exports.Functions = {
                 required: true
             }
         ]
+    },
+    $exec: {
+        key: "$exec",
+        description: "executes a command in the powershell.",
+        params: [
+            {
+                name: "command",
+                description: "the command to execute",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true
+            }
+        ],
+        isProperty: false,
+        returns: "ANY",
+        emptyReturn: true
     },
     $ephemeral: {
         returns: "NONE",
@@ -1075,6 +1105,34 @@ module.exports.Functions = {
             }
         ]
     },
+    $joinVoice: {
+        key: "$joinVoice",
+        isProperty: false,
+        description: "makes the bot join a voice channel.",
+        params: [
+            {
+                name: "channel ID",
+                description: "the voice channel to join to.",
+                resolveType: "CHANNEL",
+                type: "STRING",
+                required: true
+            }
+        ]
+    },
+    $leaveVoice: {
+        key: "$leaveVoice",
+        isProperty: false,
+        description: "makes the bot leave a voice channel.",
+        params: [
+            {
+                name: "channel ID",
+                description: "the voice channel to leave.",
+                resolveType: "CHANNEL",
+                type: "STRING",
+                required: true
+            }
+        ]
+    },
     $createSlashCommand: {
         key: "$createSlashCommand",
         description: "creates a global or guild slash command.",
@@ -1155,8 +1213,72 @@ module.exports.Functions = {
                 required: true
             }
         ]
+    },
+    $playSong: {
+        key: "$playSong",
+        description: "plays a song in a guild.",
+        isProperty: false,
+        returns: "BOOLEAN",
+        emptyReturn: true,
+        params: [
+            {
+                name: "guildID",
+                description: "the guild to add this song to",
+                type: "STRING",
+                resolveType: "GUILD",
+                required: true
+            }, 
+            {
+                name: "song url",
+                description: "the song to play.",
+                type: "STRING",
+                resolveType: "STRING",
+                required: true 
+            },
+            {
+                name: "isPlayingNow",
+                description: "returns whether the bot is playing this song now.",
+                type: "BOOLEAN",
+                resolveType: "BOOLEAN",
+                required: false,
+                default: false
+            }
+        ]
     }
 }
+
+module.exports.loopTypes = createEnum([
+    "NONE",
+    "SONG",
+    "QUEUE"
+])
+
+/**
+ * @typedef {Object} VoiceData 
+ * @property {Track[]} queue 
+ * @property {AudioPlayer} player 
+ * @property {Track[]} all 
+ * @property {number} volume 
+ * @property {PlayerSubscription} subscription
+ * @property {Guild} guild 
+ * @property {VoiceConnection} connection
+ * @property {VoiceChannel} voice 
+ * @property {TextChannel} channel 
+ * @property {?Message} lastMessage 
+ * @property {number} loopType  
+ */
+
+/**
+ * @typedef {Object} TrackData 
+ * @property {string} title 
+ * @property {string} author 
+ * @property {User} user 
+ * @property {number} duration 
+ * @property {string} thumbnail
+ * @property {string} image 
+ * @property {string} uri 
+ * @property {string} url 
+ */
 
 /**
  * @typedef {Object} Brackets
@@ -1232,6 +1354,7 @@ module.exports.Functions = {
 
 /**
  * @typedef {Object} ExtrasData 
+ * @property {Track} track 
  * @property {Collection<string, CommandInteractionOption>} options
  * @property {CommandInteraction|MessageComponentInteraction} interaction 
  */

@@ -1,12 +1,13 @@
+import { AudioResource, PlayerSubscription, VoiceConnection } from "@discordjs/voice"
 import { ApplicationCommandData, Client, ClientOptions, Collection } from "discord.js"
 import { SqliteDatabase } from "sqlite_master.db"
 import { ColumnData } from "sqlite_master.db/src/util/Constants"
 import CommandAdapter from "./structures/CommandAdapter"
-import { Commands } from "./util/Constants"
+import { Commands, TrackData, VoiceData } from "./util/Constants"
 
 declare type Types = "NUMBER" | "ANY" | "BOOLEAN" | "NONE" | "STRING"
 
-declare type CommandTypes = "basicCommand" | "readyCommand" | "slashCommand" | "buttonCommand"
+declare type CommandTypes = "basicCommand" | "readyCommand" | "slashCommand" | "buttonCommand" | "musicEndCommand" | "musicStartCommand"
 
 declare type ResolveTypes = "MEMBER" |
     "TIME" |
@@ -23,13 +24,38 @@ declare type ResolveTypes = "MEMBER" |
 declare type BDscriptErrors = "INVALID_COMMAND_TYPE" | "INVALID_EVENT_TYPE" | "EVENT_ALREADY_REGISTERED" |
     "SYNTAX_ERROR" | "SLASH_COMMAND_ALREADY_EXISTS"
 
-declare type EventTypes = "onReady" | "onMessage" | "onInteraction"
+declare type EventTypes = "onReady" | "onMessage" | "onInteraction" | "onMusicStart" | "onMusicEnd"
 
 interface BotOptions {
     token?: string
     prefix: string[] | string
     client?: ClientOptions 
     databasePath?: string 
+}
+
+export class AudioManager {
+    bot: Bot
+    guilds: Collection<string, VoiceData>
+
+    constructor(bot: Bot) 
+
+    public queue(tracks: TrackData | TrackData[]): Promise<boolean | undefined | number> 
+    public play(guildID: string): Promise<boolean | undefined | number> 
+    public leaveVoice(guildID: string): boolean | undefined
+    public joinVoice(guildID: string): ?VoiceConnection 
+    public subscribe(guildID: string): PlayerSubscription
+
+    private add(target: Object, source: Object): Object
+}
+
+export class Track {
+    data: TrackData
+
+    constructor(data: TrackData)
+
+    public onFinish(guildID: string): void 
+    public onStart(guildID: string): void
+    public createAudioResource(url: string, options: any): Promise<AudioResource<this>>
 }
 
 export class CommandManager {
@@ -49,6 +75,7 @@ interface CommandData {
     aliases?: Array<string>
 }
 export class Bot {
+    audio: AudioManager
     events: EventTypes[]
     manager: CommandManager
     client: Client 

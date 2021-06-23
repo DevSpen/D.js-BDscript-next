@@ -6,15 +6,13 @@ const CompileData = require("../structures/CompileData");
  * @param {import("../util/Constants").ExecutionData} d 
  */
 module.exports = async (fn, d) => {
-    const [
-        channel,
-        message,
-        returnID
-    ] = (await fn.resolveArray(d)) ?? []
+    const [channel] = await fn.resolveArray(d) ?? []
 
     if (channel === undefined) return undefined
 
-    const m = await d.container.execute(message, channel)
+    const connection = d.bot.audio.joinVoice(channel.id)
 
-    return fn.deflate(returnID && m ? m.id : "")
+    if (!connection) return fn.sendError(d.mainChannel, `:x: Failed to join voice channel!`)
+
+    return fn.deflate()
 }

@@ -4,9 +4,11 @@
 ✔️ - Typings <br>
 ✔️ - Variables <br>
 ✔️ - Database <br>
+❌ - All Functions <br>
 ✔️ - Slash Command Support <br>
-🛠️ - All Condensed Functions <br>
-🛠️ - Button Support 
+❌ - All Condensed Functions <br>
+🛠️ - Button Support <br>
+🛠️ - Music Support <br>
 ✔️ - Command Manager
 ### Examples (Setting up a bot with eval) ###
 ```js

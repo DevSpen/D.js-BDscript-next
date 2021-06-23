@@ -1,7 +1,7 @@
 const Container = require("../structures/Container")
 const Interpreter = require("../main/Interpreter");
 const CommandAdapter = require("../structures/CommandAdapter");
-const CompileData = require("../Structures/CompileData");
+const CompileData = require("../structures/CompileData");
 
 /**
  * 
