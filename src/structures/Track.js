@@ -1,6 +1,5 @@
 const { createAudioResource, AudioResource, demuxProbe, StreamType } = require("@discordjs/voice")
 const { Client } = require("discord.js")
-const { raw } = require("youtube-dl-exec")
 
 module.exports = class Track {
     /**
@@ -32,6 +31,8 @@ module.exports = class Track {
      * @returns {Promise<AudioResource<Track>>} 
      */
     createAudioResource(options = {}) {
+		const { raw } = require("youtube-dl-exec")
+		
 		return new Promise((resolve, reject) => {
 			const process = raw(
 				this.data.url,
